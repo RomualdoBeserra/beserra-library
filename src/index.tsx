@@ -305,7 +305,7 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">CPF <span class="text-red-500">*</span></label>
-            <input id="emp-cpf" type="text" required placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"/>
+            <input id="emp-cpf" type="text" required placeholder="000.000.000-00" maxlength="14" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"/>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Prazo desejado</label>
@@ -329,7 +329,7 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">CEP <span class="text-red-500">*</span></label>
             <div class="relative">
-              <input id="emp-cep" type="text" required placeholder="00000-000" maxlength="9" oninput="maskCEP(this)" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 pr-10"/>
+              <input id="emp-cep" type="text" required placeholder="00000-000" maxlength="9" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 pr-10"/>
               <button type="button" onclick="buscarCEP()" class="absolute right-2 top-1/2 -translate-y-1/2 text-violet-500 hover:text-violet-700"><i class="fas fa-search text-sm"></i></button>
             </div>
             <p id="cep-status" class="text-xs mt-1 text-gray-400"></p>
@@ -431,17 +431,29 @@ function empStatusBadge(s){
 }
 
 function maskCPF(el){
-  let v=el.value.replace(/\D/g,'');
-  if(v.length>11)v=v.substring(0,11);
-  v=v.replace(/(\d{3})(\d)/,'\$1.\$2').replace(/(\d{3})(\d)/,'\$1.\$2').replace(/(\d{3})(\d{1,2})$/,'\$1-\$2');
-  el.value=v;
+  const pos=el.selectionStart||0;
+  const prev=el.value;
+  let d=prev.replace(/\D/g,'').substring(0,11);
+  let f=d;
+  if(d.length>9)f=d.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/,'\$1.\$2.\$3-\$4');
+  else if(d.length>6)f=d.replace(/(\d{3})(\d{3})(\d+)/,'\$1.\$2.\$3');
+  else if(d.length>3)f=d.replace(/(\d{3})(\d+)/,'\$1.\$2');
+  el.value=f;
+  const dots=f.split('').filter(c=>c==='.'||c==='-').length - prev.split('').filter(c=>c==='.'||c==='-').length;
+  const newPos=Math.min(pos+(dots>0?dots:0),f.length);
+  el.setSelectionRange(newPos,newPos);
 }
 function maskCEP(el){
-  let v=el.value.replace(/\D/g,'');
-  if(v.length>8)v=v.substring(0,8);
-  if(v.length>5)v=v.substring(0,5)+'-'+v.substring(5);
-  el.value=v;
-  if(v.replace('-','').length===8)buscarCEP();
+  const pos=el.selectionStart;
+  const prev=el.value;
+  let digits=prev.replace(/\D/g,'').substring(0,8);
+  let formatted=digits.length>5?digits.substring(0,5)+'-'+digits.substring(5):digits;
+  el.value=formatted;
+  // restaura cursor considerando o traço inserido
+  const addedDash=(formatted.length>prev.length&&formatted[5]==='-'&&prev.length<=5)?1:0;
+  const newPos=Math.min((pos||0)+addedDash,formatted.length);
+  el.setSelectionRange(newPos,newPos);
+  if(digits.length===8)buscarCEP();
 }
 
 // ─── NAVEGAÇÃO ──────────────────────────────────────
@@ -1059,6 +1071,14 @@ async function deleteCategoria(id,nome){
 
 // ─── BUSCA GLOBAL ─────────────────────────────────────
 document.getElementById('search-global').addEventListener('input',()=>{clearTimeout(searchTimeout);searchTimeout=setTimeout(loadLivros,350);});
+
+// ─── MASKS via addEventListener (evita problemas de cursor com oninput inline) ─
+document.addEventListener('DOMContentLoaded',()=>{
+  const cepEl=document.getElementById('emp-cep');
+  if(cepEl)cepEl.addEventListener('input',function(){maskCEP(this)});
+  const cpfEl=document.getElementById('emp-cpf');
+  if(cpfEl)cpfEl.addEventListener('input',function(){maskCPF(this)});
+});
 
 // ─── INIT ─────────────────────────────────────────────
 async function init(){
