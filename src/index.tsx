@@ -439,8 +439,15 @@ function maskCPF(el){
   el.value=f;
 }
 function maskCEP(el){
-  let digits=el.value.replace(/\D/g,'').substring(0,8);
-  el.value=digits.length>5?digits.substring(0,5)+'-'+digits.substring(5):digits;
+  const start=el.selectionStart;
+  const prev=el.value;
+  let digits=prev.replace(/\D/g,'').substring(0,8);
+  const formatted=digits.length>5?digits.substring(0,5)+'-'+digits.substring(5):digits;
+  if(formatted===prev){return;}
+  el.value=formatted;
+  // ajusta cursor: se adicionou traço antes da posição, avança 1
+  const added=formatted.length-prev.length;
+  try{el.setSelectionRange(start+added,start+added);}catch(e){}
   if(digits.length===8)buscarCEP();
 }
 
@@ -1060,13 +1067,22 @@ async function deleteCategoria(id,nome){
 // ─── BUSCA GLOBAL ─────────────────────────────────────
 document.getElementById('search-global').addEventListener('input',()=>{clearTimeout(searchTimeout);searchTimeout=setTimeout(loadLivros,350);});
 
-// ─── MASKS via addEventListener (evita problemas de cursor com oninput inline) ─
-document.addEventListener('DOMContentLoaded',()=>{
+// ─── MASKS — registra direto (script está no final do body, DOM já existe) ─────
+(function(){
   const cepEl=document.getElementById('emp-cep');
-  if(cepEl)cepEl.addEventListener('input',function(){maskCEP(this)});
+  if(cepEl){
+    // remove qualquer listener anterior clonando o nó
+    const fresh=cepEl.cloneNode(true);
+    cepEl.parentNode.replaceChild(fresh,cepEl);
+    fresh.addEventListener('input',function(){maskCEP(this);});
+  }
   const cpfEl=document.getElementById('emp-cpf');
-  if(cpfEl)cpfEl.addEventListener('input',function(){maskCPF(this)});
-});
+  if(cpfEl){
+    const fresh=cpfEl.cloneNode(true);
+    cpfEl.parentNode.replaceChild(fresh,cpfEl);
+    fresh.addEventListener('input',function(){maskCPF(this);});
+  }
+})();
 
 // ─── INIT ─────────────────────────────────────────────
 async function init(){
