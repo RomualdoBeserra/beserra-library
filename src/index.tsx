@@ -19,7 +19,7 @@ app.get('/', (c) => {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Biblioteca Digital</title>
+  <title>Beserra Library</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
@@ -60,8 +60,8 @@ app.get('/', (c) => {
           <i class="fas fa-book-open text-white text-lg"></i>
         </div>
         <div>
-          <h1 class="font-serif text-xl font-bold text-gray-900">Biblioteca Digital</h1>
-          <p class="text-xs text-gray-500">Gerenciamento de acervo</p>
+          <h1 class="font-serif text-xl font-bold text-gray-900">Beserra Library</h1>
+          <p class="text-xs text-gray-500">Book Collection Management</p>
         </div>
       </div>
       <div class="flex items-center gap-3">
