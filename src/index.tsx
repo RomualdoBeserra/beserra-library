@@ -96,6 +96,7 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
           <li><button onclick="setView('emprestimos')" id="nav-emprestimos" class="sidebar-item w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 hover:bg-gray-50"><i class="fas fa-handshake w-4 text-center"></i> Empréstimos <span id="badge-emp" class="ml-auto bg-amber-100 text-amber-700 text-xs px-1.5 py-0.5 rounded-full hidden"></span></button></li>
           <li><button onclick="setView('autores')" id="nav-autores" class="sidebar-item w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 hover:bg-gray-50"><i class="fas fa-user-pen w-4 text-center"></i> Autores</button></li>
           <li><button onclick="setView('categorias')" id="nav-categorias" class="sidebar-item w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 hover:bg-gray-50"><i class="fas fa-tags w-4 text-center"></i> Categorias</button></li>
+          <li><button onclick="setView('configuracoes')" id="nav-configuracoes" class="sidebar-item w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 hover:bg-gray-50"><i class="fas fa-gear w-4 text-center"></i> Configurações</button></li>
         </ul>
         <div class="p-4 border-t border-gray-100 mt-2">
           <div class="space-y-2 text-xs text-gray-500">
@@ -168,6 +169,103 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
           <button onclick="openModal('modal-categoria')" class="bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"><i class="fas fa-plus"></i> Nova Categoria</button>
         </div>
         <div id="categorias-container" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+      </div>
+
+      <!-- CONFIGURAÇÕES -->
+      <div id="view-configuracoes" class="hidden">
+        <div class="mb-6">
+          <h2 class="font-serif text-2xl font-bold text-gray-800">Configurações do Administrador</h2>
+          <p class="text-sm text-gray-500 mt-1">Gerencie os dados da biblioteca e a chave PIX para recebimento de pagamentos</p>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          <!-- Card Perfil -->
+          <div class="bg-white rounded-2xl border border-gray-200 p-6">
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
+                <i class="fas fa-building text-violet-600"></i>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-800">Dados da Biblioteca</h3>
+                <p class="text-xs text-gray-500">Informações exibidas nos comprovantes</p>
+              </div>
+            </div>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nome da Biblioteca</label>
+                <input id="cfg-nome" type="text" placeholder="Ex: Beserra Library" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition"/>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Responsável</label>
+                <input id="cfg-responsavel" type="text" placeholder="Nome do administrador" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition"/>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">E-mail de contato</label>
+                <input id="cfg-email" type="email" placeholder="contato@biblioteca.com" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition"/>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Telefone / WhatsApp</label>
+                <input id="cfg-telefone" type="text" placeholder="(11) 99999-9999" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition"/>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card PIX -->
+          <div class="bg-white rounded-2xl border border-gray-200 p-6">
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                <i class="fas fa-qrcode text-green-600"></i>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-800">Chave PIX</h3>
+                <p class="text-xs text-gray-500">Usada para receber o pagamento do frete</p>
+              </div>
+            </div>
+
+            <!-- Preview PIX -->
+            <div id="pix-preview" class="hidden mb-5 bg-green-50 border border-green-200 rounded-xl p-4 text-center">
+              <div class="w-16 h-16 mx-auto mb-2 bg-white rounded-xl flex items-center justify-center shadow-sm border border-green-100">
+                <i class="fas fa-qrcode text-green-600 text-3xl"></i>
+              </div>
+              <p class="text-xs text-green-600 font-semibold mb-1">Chave PIX cadastrada</p>
+              <p id="pix-preview-tipo" class="text-xs text-gray-500 mb-1"></p>
+              <p id="pix-preview-chave" class="font-mono text-sm font-bold text-gray-800 break-all"></p>
+              <p id="pix-preview-nome" class="text-xs text-gray-500 mt-1"></p>
+            </div>
+
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Chave</label>
+                <select id="cfg-pix-tipo" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition" onchange="atualizarPlaceholderPix()">
+                  <option value="cpf">CPF</option>
+                  <option value="cnpj">CNPJ</option>
+                  <option value="email">E-mail</option>
+                  <option value="telefone">Telefone</option>
+                  <option value="aleatoria">Chave Aleatória</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Chave PIX <span class="text-red-500">*</span></label>
+                <input id="cfg-pix-chave" type="text" placeholder="000.000.000-00" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition font-mono"/>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Titular</label>
+                <input id="cfg-pix-titular" type="text" placeholder="Nome que aparece no PIX" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition"/>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Banco</label>
+                <input id="cfg-pix-banco" type="text" placeholder="Ex: Nubank, Itaú, Bradesco..." class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition"/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botão salvar -->
+        <div class="mt-6 flex justify-end">
+          <button onclick="salvarConfiguracoes()" class="bg-violet-600 hover:bg-violet-700 text-white px-8 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition-colors shadow-sm">
+            <i class="fas fa-save"></i> Salvar Configurações
+          </button>
+        </div>
       </div>
 
     </main>
@@ -446,9 +544,66 @@ function maskCEP(el){
   if(raw.length===8) buscarCEP(raw);
 }
 
+// ─── CONFIGURAÇÕES ADMIN ─────────────────────────────
+async function loadConfiguracoes(){
+  try{
+    const{data}=await axios.get('/api/admin/config');
+    document.getElementById('cfg-nome').value=data.nome||'';
+    document.getElementById('cfg-responsavel').value=data.responsavel||'';
+    document.getElementById('cfg-email').value=data.email||'';
+    document.getElementById('cfg-telefone').value=data.telefone||'';
+    document.getElementById('cfg-pix-tipo').value=data.pix_tipo||'cpf';
+    document.getElementById('cfg-pix-chave').value=data.pix_chave||'';
+    document.getElementById('cfg-pix-titular').value=data.pix_titular||'';
+    document.getElementById('cfg-pix-banco').value=data.pix_banco||'';
+    atualizarPlaceholderPix();
+    atualizarPreviewPix(data);
+  }catch(e){showToast('Erro ao carregar configurações','error');}
+}
+
+async function salvarConfiguracoes(){
+  const chave=document.getElementById('cfg-pix-chave').value.trim();
+  if(!chave){showToast('Informe a chave PIX','warning');return;}
+  const body={
+    nome:document.getElementById('cfg-nome').value.trim(),
+    responsavel:document.getElementById('cfg-responsavel').value.trim(),
+    email:document.getElementById('cfg-email').value.trim(),
+    telefone:document.getElementById('cfg-telefone').value.trim(),
+    pix_tipo:document.getElementById('cfg-pix-tipo').value,
+    pix_chave:chave,
+    pix_titular:document.getElementById('cfg-pix-titular').value.trim(),
+    pix_banco:document.getElementById('cfg-pix-banco').value.trim(),
+  };
+  try{
+    await axios.put('/api/admin/config',body);
+    showToast('Configurações salvas com sucesso!');
+    atualizarPreviewPix(body);
+  }catch(e){showToast('Erro ao salvar configurações','error');}
+}
+
+function atualizarPlaceholderPix(){
+  const tipo=document.getElementById('cfg-pix-tipo').value;
+  const el=document.getElementById('cfg-pix-chave');
+  const placeholders={cpf:'000.000.000-00',cnpj:'00.000.000/0001-00',email:'seuemail@exemplo.com',telefone:'+55 11 99999-9999',aleatoria:'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'};
+  el.placeholder=placeholders[tipo]||'';
+}
+
+function atualizarPreviewPix(data){
+  const prev=document.getElementById('pix-preview');
+  if(data.pix_chave){
+    prev.classList.remove('hidden');
+    const tipos={cpf:'CPF',cnpj:'CNPJ',email:'E-mail',telefone:'Telefone',aleatoria:'Chave Aleatória'};
+    document.getElementById('pix-preview-tipo').textContent='Tipo: '+(tipos[data.pix_tipo]||data.pix_tipo||'');
+    document.getElementById('pix-preview-chave').textContent=data.pix_chave;
+    document.getElementById('pix-preview-nome').textContent=(data.pix_titular?data.pix_titular:'')+(data.pix_banco?' · '+data.pix_banco:'');
+  } else {
+    prev.classList.add('hidden');
+  }
+}
+
 // ─── NAVEGAÇÃO ──────────────────────────────────────
 function setView(view){
-  ['livros','emprestimos','autores','categorias'].forEach(v=>{
+  ['livros','emprestimos','autores','categorias','configuracoes'].forEach(v=>{
     document.getElementById('view-'+v).classList.toggle('hidden',v!==view);
     const nav=document.getElementById('nav-'+v);
     if(v===view){nav.classList.add('active');nav.classList.remove('text-gray-600','hover:bg-gray-50');}
@@ -458,6 +613,7 @@ function setView(view){
   if(view==='emprestimos')loadEmprestimos();
   if(view==='autores')loadAutores();
   if(view==='categorias')loadCategorias();
+  if(view==='configuracoes')loadConfiguracoes();
 }
 
 // ─── LAYOUT ─────────────────────────────────────────
@@ -751,103 +907,142 @@ async function empStep3(){
   try{
     const{data}=await axios.post('/api/emprestimos',payload);
     showStep(3);
-    renderBoleto(data);
+    renderPIX(data);
     // atualiza badge
     loadBadgeEmprestimos();
     loadLivros();
   }catch(e){showToast(e.response?.data?.error||'Erro ao criar empréstimo','error')}
 }
 
-function renderBoleto(emp){
-  const venc=new Date();venc.setDate(venc.getDate()+3);
-  const vencStr=venc.toLocaleDateString('pt-BR');
-  const cod=emp.codigo_boleto||'';
-  const linha=emp.linha_digitavel||'';
-  // gera barras visuais simuladas
-  const bars=gerarBarras(cod);
+async function renderPIX(emp){
+  // Busca a chave PIX cadastrada nas configurações
+  let pixChave='', pixTipo='', pixTitular='', pixBanco='', nomeBib='Beserra Library';
+  try{
+    const{data}=await axios.get('/api/admin/config');
+    pixChave=data.pix_chave||'';
+    pixTipo=data.pix_tipo||'';
+    pixTitular=data.pix_titular||'';
+    pixBanco=data.pix_banco||'';
+    nomeBib=data.nome||'Beserra Library';
+  }catch(e){}
+
+  const semPix=!pixChave;
+  const tipos={cpf:'CPF',cnpj:'CNPJ',email:'E-mail',telefone:'Telefone',aleatoria:'Chave Aleatória'};
+  const tipoLabel=tipos[pixTipo]||pixTipo||'';
 
   document.getElementById('boleto-container').innerHTML=\`
     <div class="text-center mb-5">
-      <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3"><i class="fas fa-check text-green-600 text-2xl"></i></div>
+      <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+        <i class="fas fa-check text-green-600 text-2xl"></i>
+      </div>
       <h4 class="font-serif text-xl font-bold text-gray-800">Empréstimo solicitado!</h4>
-      <p class="text-sm text-gray-500 mt-1">Pague o boleto para confirmar o envio</p>
+      <p class="text-sm text-gray-500 mt-1">Realize o pagamento via PIX para confirmar o envio</p>
     </div>
 
-    <div class="boleto-box border-2 border-gray-300 rounded-xl overflow-hidden">
-      <!-- Topo boleto -->
-      <div class="bg-gray-800 text-white px-5 py-3 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <i class="fas fa-book-open text-xl"></i>
-          <div><p class="font-bold text-sm">Beserra Library</p><p class="text-xs text-gray-300">CNPJ 00.000.000/0001-00</p></div>
+    \${semPix?\`
+      <div class="bg-red-50 border border-red-200 rounded-xl p-5 text-center">
+        <i class="fas fa-exclamation-triangle text-red-400 text-2xl mb-2"></i>
+        <p class="text-red-700 font-semibold text-sm">Chave PIX não configurada</p>
+        <p class="text-red-500 text-xs mt-1">O administrador precisa cadastrar a chave PIX em Configurações antes de receber pagamentos.</p>
+      </div>
+    \`:\`
+      <!-- Comprovante de solicitação -->
+      <div class="border-2 border-gray-200 rounded-xl overflow-hidden mb-4">
+        <div class="bg-gray-800 text-white px-5 py-3 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <i class="fas fa-book-open text-xl"></i>
+            <div><p class="font-bold text-sm">\${nomeBib}</p><p class="text-xs text-gray-300">Comprovante de Solicitação</p></div>
+          </div>
+          <div class="text-right">
+            <p class="text-xs text-gray-300">Nº do Pedido</p>
+            <p class="font-bold text-amber-300">#\${String(emp.id).padStart(6,'0')}</p>
+          </div>
         </div>
-        <div class="text-right"><p class="text-xs text-gray-300">Vencimento</p><p class="font-bold text-amber-300">\${vencStr}</p></div>
-      </div>
-
-      <!-- Info -->
-      <div class="bg-white px-5 py-4 grid grid-cols-2 gap-3 text-xs border-b border-dashed border-gray-300">
-        <div><p class="text-gray-400 mb-0.5">Beneficiário</p><p class="font-semibold text-gray-800">Beserra Library LTDA</p></div>
-        <div><p class="text-gray-400 mb-0.5">Código do Empréstimo</p><p class="font-semibold text-gray-800">#\${String(emp.id).padStart(6,'0')}</p></div>
-        <div><p class="text-gray-400 mb-0.5">Pagador</p><p class="font-semibold text-gray-800">\${emp.solicitante_nome}</p></div>
-        <div><p class="text-gray-400 mb-0.5">CPF</p><p class="font-semibold text-gray-800">\${emp.solicitante_cpf}</p></div>
-        <div class="col-span-2"><p class="text-gray-400 mb-0.5">Descrição</p><p class="font-semibold text-gray-800">Empréstimo de livro — \${emp.livro_titulo} · Frete \${emp.frete_modalidade}</p></div>
-      </div>
-
-      <!-- Valor -->
-      <div class="bg-violet-50 px-5 py-3 flex items-center justify-between">
-        <p class="text-sm text-gray-600">Valor do frete (envio)</p>
-        <p class="font-bold text-2xl text-violet-700">\${fmtMoeda(emp.frete_valor)}</p>
-      </div>
-
-      <!-- Código de barras visual -->
-      <div class="bg-white px-5 py-4 text-center">
-        <div class="overflow-x-auto pb-1">\${bars}</div>
-        <p class="text-xs text-gray-500 mt-2 tracking-widest font-mono break-all">\${linha}</p>
-      </div>
-
-      <!-- Linha digitável destaque -->
-      <div class="bg-gray-50 border-t border-gray-200 px-5 py-3">
-        <p class="text-xs text-gray-400 mb-1">Linha digitável</p>
-        <div class="flex items-center gap-2">
-          <p id="linha-display" class="font-mono text-sm font-semibold text-gray-800 flex-1 break-all">\${linha}</p>
-          <button onclick="copiarLinha('\${linha}')" class="flex-shrink-0 px-3 py-1.5 bg-violet-600 text-white text-xs rounded-lg hover:bg-violet-700 flex items-center gap-1"><i class="fas fa-copy"></i> Copiar</button>
+        <div class="bg-white px-5 py-4 grid grid-cols-2 gap-3 text-xs border-b border-dashed border-gray-200">
+          <div><p class="text-gray-400 mb-0.5">Solicitante</p><p class="font-semibold text-gray-800">\${emp.solicitante_nome}</p></div>
+          <div><p class="text-gray-400 mb-0.5">CPF</p><p class="font-semibold text-gray-800">\${emp.solicitante_cpf}</p></div>
+          <div class="col-span-2"><p class="text-gray-400 mb-0.5">Livro</p><p class="font-semibold text-gray-800">\${emp.livro_titulo}</p></div>
+          <div><p class="text-gray-400 mb-0.5">Modalidade de Frete</p><p class="font-semibold text-gray-800">\${emp.frete_modalidade}</p></div>
+          <div><p class="text-gray-400 mb-0.5">Prazo do Empréstimo</p><p class="font-semibold text-gray-800">\${emp.prazo_dias} dias</p></div>
+        </div>
+        <div class="bg-violet-50 px-5 py-3 flex items-center justify-between">
+          <p class="text-sm text-gray-600 font-medium">Valor a pagar (frete)</p>
+          <p class="font-bold text-2xl text-violet-700">\${fmtMoeda(emp.frete_valor)}</p>
         </div>
       </div>
-    </div>
 
-    <!-- Instruções -->
-    <div class="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm">
-      <p class="font-semibold text-amber-800 mb-2"><i class="fas fa-info-circle mr-2"></i>Instruções</p>
-      <ul class="space-y-1 text-amber-700 text-xs list-disc list-inside">
-        <li>Pague o boleto até <strong>\${vencStr}</strong> para garantir o envio</li>
-        <li>Após confirmação do pagamento, o livro será enviado em até 2 dias úteis</li>
-        <li>O prazo de empréstimo é de <strong>\${emp.prazo_dias} dias</strong> a partir do recebimento</li>
-        <li>Você receberá o código de rastreamento por e-mail</li>
-      </ul>
-    </div>
+      <!-- Área PIX -->
+      <div class="bg-green-50 border-2 border-green-300 rounded-xl overflow-hidden">
+        <div class="bg-green-600 text-white px-5 py-3 flex items-center gap-3">
+          <i class="fas fa-qrcode text-xl"></i>
+          <div>
+            <p class="font-bold text-sm">Pagar via PIX</p>
+            <p class="text-xs text-green-100">Transferência instantânea — aprovação em segundos</p>
+          </div>
+        </div>
+        <div class="p-5">
+          <div class="flex flex-col sm:flex-row items-center gap-5">
+            <!-- Ícone QR -->
+            <div class="flex-shrink-0 w-28 h-28 bg-white border-2 border-green-300 rounded-xl flex flex-col items-center justify-center shadow-sm">
+              <i class="fas fa-qrcode text-green-600 text-4xl mb-1"></i>
+              <p class="text-xs text-green-600 font-semibold">PIX</p>
+            </div>
+            <!-- Dados -->
+            <div class="flex-1 w-full space-y-3">
+              \${tipoLabel?\`<div class="flex items-center gap-2 text-xs text-gray-500"><i class="fas fa-tag w-4"></i><span>Tipo: <strong>\${tipoLabel}</strong></span></div>\`:''}
+              \${pixTitular?\`<div class="flex items-center gap-2 text-xs text-gray-500"><i class="fas fa-user w-4"></i><span>\${pixTitular}</span></div>\`:''}
+              \${pixBanco?\`<div class="flex items-center gap-2 text-xs text-gray-500"><i class="fas fa-university w-4"></i><span>\${pixBanco}</span></div>\`:''}
+              <div class="bg-white border border-green-200 rounded-lg p-3">
+                <p class="text-xs text-gray-400 mb-1">Chave PIX</p>
+                <div class="flex items-center gap-2">
+                  <p id="pix-chave-display" class="font-mono text-sm font-bold text-gray-800 flex-1 break-all">\${pixChave}</p>
+                  <button onclick="copiarPIX('\${pixChave}')" class="flex-shrink-0 px-3 py-1.5 bg-green-600 text-white text-xs rounded-lg hover:bg-green-700 flex items-center gap-1 transition-colors">
+                    <i class="fas fa-copy"></i> Copiar
+                  </button>
+                </div>
+              </div>
+              <div class="bg-white border border-green-200 rounded-lg p-3">
+                <p class="text-xs text-gray-400 mb-1">Valor exato a transferir</p>
+                <p class="font-bold text-xl text-green-700">\${fmtMoeda(emp.frete_valor)}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Instruções -->
+      <div class="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-4">
+        <p class="font-semibold text-amber-800 text-sm mb-2"><i class="fas fa-info-circle mr-2"></i>Como pagar</p>
+        <ol class="space-y-1.5 text-amber-700 text-xs list-decimal list-inside">
+          <li>Abra o app do seu banco e acesse a área <strong>PIX</strong></li>
+          <li>Escolha <strong>Pagar com chave PIX</strong> e cole a chave acima</li>
+          <li>Confirme o valor de <strong>\${fmtMoeda(emp.frete_valor)}</strong> e finalize o pagamento</li>
+          <li>Após confirmação, o livro será enviado em até <strong>2 dias úteis</strong></li>
+          <li>Você receberá o código de rastreamento por e-mail</li>
+        </ol>
+      </div>
+    \`}
 
     <div class="mt-4 flex gap-3">
-      <button onclick="window.print()" class="flex-1 border border-gray-200 text-gray-600 rounded-lg py-2 text-sm hover:bg-gray-50 flex items-center justify-center gap-2"><i class="fas fa-print"></i> Imprimir</button>
-      <button onclick="closeModal('modal-emprestimo');setView('emprestimos')" class="flex-1 bg-violet-600 text-white rounded-lg py-2 text-sm font-medium hover:bg-violet-700 flex items-center justify-center gap-2"><i class="fas fa-list"></i> Ver Empréstimos</button>
+      <button onclick="window.print()" class="flex-1 border border-gray-200 text-gray-600 rounded-lg py-2 text-sm hover:bg-gray-50 flex items-center justify-center gap-2">
+        <i class="fas fa-print"></i> Imprimir
+      </button>
+      <button onclick="closeModal('modal-emprestimo');setView('emprestimos')" class="flex-1 bg-violet-600 text-white rounded-lg py-2 text-sm font-medium hover:bg-violet-700 flex items-center justify-center gap-2">
+        <i class="fas fa-list"></i> Ver Empréstimos
+      </button>
     </div>
   \`;
 }
 
-function gerarBarras(codigo){
-  // Gera barras visuais de código de barras a partir do código
-  const str=codigo||'12345678901234567890123456789012345678901234567890';
-  let html='<div style="display:inline-flex;gap:1px;align-items:flex-end">';
-  for(let i=0;i<str.length;i++){
-    const c=str.charCodeAt(i);
-    const w=((c%3)+1)*1.5;
-    const h=40+((c%5)*4);
-    html+=\`<div class="barcode-bar" style="width:\${w}px;height:\${h}px"></div>\`;
-  }
-  html+='</div>';
-  return html;
-}
-
-function copiarLinha(linha){
-  navigator.clipboard.writeText(linha).then(()=>showToast('Linha digitável copiada!','info')).catch(()=>showToast('Não foi possível copiar','error'));
+function copiarPIX(chave){
+  navigator.clipboard.writeText(chave).then(()=>showToast('Chave PIX copiada!','info')).catch(()=>{
+    // fallback para browsers sem clipboard API
+    const el=document.createElement('textarea');
+    el.value=chave;el.style.position='fixed';el.style.opacity='0';
+    document.body.appendChild(el);el.select();
+    document.execCommand('copy');document.body.removeChild(el);
+    showToast('Chave PIX copiada!','info');
+  });
 }
 
 // ─── EMPRÉSTIMOS (ADMIN) ─────────────────────────────
@@ -950,7 +1145,6 @@ async function cancelarEmprestimo(id){
 async function verDetalheEmprestimo(id){
   try{
     const{data:e}=await axios.get('/api/emprestimos/'+id);
-    const linha=e.linha_digitavel||'';
     document.getElementById('emp-detalhe-content').innerHTML=\`
       <div class="flex items-start justify-between mb-5">
         <div>
@@ -973,7 +1167,7 @@ async function verDetalheEmprestimo(id){
           <div class="bg-gray-50 rounded-lg p-3"><p class="text-xs text-gray-400 mb-0.5">Prazo devolução</p><p class="font-medium">\${e.prazo_dias} dias</p></div>
         </div>
         \${e.codigo_rastreamento?\`<div class="bg-indigo-50 rounded-lg p-3"><p class="text-xs text-indigo-400 mb-0.5">Rastreamento</p><p class="font-mono font-bold text-indigo-700">\${e.codigo_rastreamento}</p></div>\`:''}
-        \${linha?\`<div class="bg-gray-50 rounded-lg p-3"><p class="text-xs text-gray-400 mb-1">Linha digitável do boleto</p><p class="font-mono text-xs font-semibold text-gray-700 break-all">\${linha}</p></div>\`:''}
+        <div class="bg-green-50 rounded-lg p-3"><p class="text-xs text-green-600 mb-0.5">Pagamento via PIX</p><p class="text-xs text-green-700">Confirme o recebimento na sua conta bancária antes de marcar como pago.</p></div>
         <p class="text-xs text-gray-400 text-right">Solicitado em \${fmtData(e.created_at)}</p>
       </div>
     \`;
@@ -1114,6 +1308,11 @@ app.use('/api/*', async (c, next) => {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (livro_id) REFERENCES livros(id)
+    )`).run()
+    await DB.prepare(`CREATE TABLE IF NOT EXISTS configuracoes (
+      chave TEXT PRIMARY KEY,
+      valor TEXT NOT NULL,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`).run()
 
     // Seed sempre via INSERT OR IGNORE (idempotente)
@@ -1478,6 +1677,27 @@ app.delete('/api/categorias/:id', async (c) => {
   if (u && u.n > 0) return c.json({ error: 'Categoria possui livros. Remova-os primeiro.' }, 409)
   await DB.prepare('DELETE FROM categorias WHERE id=?').bind(c.req.param('id')).run()
   return c.json({ message: 'Excluído' })
+})
+
+// ─── API CONFIGURAÇÕES ADMIN ──────────────────────────────────────────────────
+app.get('/api/admin/config', async (c) => {
+  const { DB } = c.env
+  const rows = await DB.prepare('SELECT chave, valor FROM configuracoes').all<{chave:string, valor:string}>()
+  const config: Record<string,string> = {}
+  for (const r of rows.results) config[r.chave] = r.valor
+  return c.json(config)
+})
+
+app.put('/api/admin/config', async (c) => {
+  const { DB } = c.env
+  const body = await c.req.json() as Record<string,string>
+  for (const [chave, valor] of Object.entries(body)) {
+    await DB.prepare(`
+      INSERT INTO configuracoes (chave, valor, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)
+      ON CONFLICT(chave) DO UPDATE SET valor=excluded.valor, updated_at=excluded.updated_at
+    `).bind(chave, String(valor)).run()
+  }
+  return c.json({ message: 'Configurações salvas' })
 })
 
 export default app
