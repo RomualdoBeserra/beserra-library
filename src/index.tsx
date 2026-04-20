@@ -442,10 +442,8 @@ function maskCEP(el){
   let raw=el.value.replace(/\D/g,'');
   if(raw.length>8) raw=raw.substring(0,8);
   const formatted=raw.length===8 ? raw.substring(0,5)+'-'+raw.substring(5) : raw;
-  // só atualiza o campo se o valor formatado for diferente do atual
-  // evita disparar novo evento 'input' e loop infinito
   if(el.value!==formatted) el.value=formatted;
-  if(raw.length===8) buscarCEP();
+  if(raw.length===8) buscarCEP(raw);
 }
 
 // ─── NAVEGAÇÃO ──────────────────────────────────────
@@ -668,9 +666,9 @@ function empStep2(){
   showStep(2);
 }
 
-async function buscarCEP(){
-  const cep=document.getElementById('emp-cep').value.replace(/\D/g,'');
-  if(cep.length!==8)return;
+async function buscarCEP(cep){
+  if(!cep) cep=document.getElementById('emp-cep').value.replace(/\D/g,'');
+  if(cep.length!==8) return;
   const st=document.getElementById('cep-status');
   st.textContent='Buscando...';st.className='text-xs mt-1 text-gray-400 animate-pulse2';
   try{
