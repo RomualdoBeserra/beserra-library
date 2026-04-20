@@ -431,28 +431,16 @@ function empStatusBadge(s){
 }
 
 function maskCPF(el){
-  const pos=el.selectionStart||0;
-  const prev=el.value;
-  let d=prev.replace(/\D/g,'').substring(0,11);
+  let d=el.value.replace(/\D/g,'').substring(0,11);
   let f=d;
   if(d.length>9)f=d.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/,'\$1.\$2.\$3-\$4');
   else if(d.length>6)f=d.replace(/(\d{3})(\d{3})(\d+)/,'\$1.\$2.\$3');
   else if(d.length>3)f=d.replace(/(\d{3})(\d+)/,'\$1.\$2');
   el.value=f;
-  const dots=f.split('').filter(c=>c==='.'||c==='-').length - prev.split('').filter(c=>c==='.'||c==='-').length;
-  const newPos=Math.min(pos+(dots>0?dots:0),f.length);
-  el.setSelectionRange(newPos,newPos);
 }
 function maskCEP(el){
-  const pos=el.selectionStart;
-  const prev=el.value;
-  let digits=prev.replace(/\D/g,'').substring(0,8);
-  let formatted=digits.length>5?digits.substring(0,5)+'-'+digits.substring(5):digits;
-  el.value=formatted;
-  // restaura cursor considerando o traço inserido
-  const addedDash=(formatted.length>prev.length&&formatted[5]==='-'&&prev.length<=5)?1:0;
-  const newPos=Math.min((pos||0)+addedDash,formatted.length);
-  el.setSelectionRange(newPos,newPos);
+  let digits=el.value.replace(/\D/g,'').substring(0,8);
+  el.value=digits.length>5?digits.substring(0,5)+'-'+digits.substring(5):digits;
   if(digits.length===8)buscarCEP();
 }
 
