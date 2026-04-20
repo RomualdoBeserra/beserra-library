@@ -329,7 +329,7 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">CEP <span class="text-red-500">*</span></label>
             <div class="relative">
-              <input id="emp-cep" type="text" required placeholder="00000-000" maxlength="9" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 pr-10"/>
+              <input id="emp-cep" type="text" required placeholder="00000-000" maxlength="9" inputmode="numeric" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 pr-10"/>
               <button type="button" onclick="buscarCEP()" class="absolute right-2 top-1/2 -translate-y-1/2 text-violet-500 hover:text-violet-700"><i class="fas fa-search text-sm"></i></button>
             </div>
             <p id="cep-status" class="text-xs mt-1 text-gray-400"></p>
@@ -439,16 +439,17 @@ function maskCPF(el){
   el.value=f;
 }
 function maskCEP(el){
-  const start=el.selectionStart;
-  const prev=el.value;
-  let digits=prev.replace(/\D/g,'').substring(0,8);
-  const formatted=digits.length>5?digits.substring(0,5)+'-'+digits.substring(5):digits;
-  if(formatted===prev){return;}
-  el.value=formatted;
-  // ajusta cursor: se adicionou traço antes da posição, avança 1
-  const added=formatted.length-prev.length;
-  try{el.setSelectionRange(start+added,start+added);}catch(e){}
-  if(digits.length===8)buscarCEP();
+  // Remove tudo que não for dígito
+  let raw=el.value.replace(/\D/g,'');
+  if(raw.length>8)raw=raw.substring(0,8);
+  // Aplica formato XXXXX-XXX apenas quando tiver os 8 dígitos completos
+  if(raw.length===8){
+    el.value=raw.substring(0,5)+'-'+raw.substring(5);
+    buscarCEP();
+  } else {
+    // Enquanto digita, mostra só os números (sem traço parcial)
+    el.value=raw;
+  }
 }
 
 // ─── NAVEGAÇÃO ──────────────────────────────────────
@@ -1067,21 +1068,12 @@ async function deleteCategoria(id,nome){
 // ─── BUSCA GLOBAL ─────────────────────────────────────
 document.getElementById('search-global').addEventListener('input',()=>{clearTimeout(searchTimeout);searchTimeout=setTimeout(loadLivros,350);});
 
-// ─── MASKS — registra direto (script está no final do body, DOM já existe) ─────
+// ─── MASKS — registra direto (DOM já existe ao final do body) ──────────────────
 (function(){
   const cepEl=document.getElementById('emp-cep');
-  if(cepEl){
-    // remove qualquer listener anterior clonando o nó
-    const fresh=cepEl.cloneNode(true);
-    cepEl.parentNode.replaceChild(fresh,cepEl);
-    fresh.addEventListener('input',function(){maskCEP(this);});
-  }
+  if(cepEl) cepEl.addEventListener('input',function(){maskCEP(this);});
   const cpfEl=document.getElementById('emp-cpf');
-  if(cpfEl){
-    const fresh=cpfEl.cloneNode(true);
-    cpfEl.parentNode.replaceChild(fresh,cpfEl);
-    fresh.addEventListener('input',function(){maskCPF(this);});
-  }
+  if(cpfEl) cpfEl.addEventListener('input',function(){maskCPF(this);});
 })();
 
 // ─── INIT ─────────────────────────────────────────────
