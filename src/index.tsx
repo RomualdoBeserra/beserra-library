@@ -439,17 +439,13 @@ function maskCPF(el){
   el.value=f;
 }
 function maskCEP(el){
-  // Remove tudo que não for dígito
   let raw=el.value.replace(/\D/g,'');
-  if(raw.length>8)raw=raw.substring(0,8);
-  // Aplica formato XXXXX-XXX apenas quando tiver os 8 dígitos completos
-  if(raw.length===8){
-    el.value=raw.substring(0,5)+'-'+raw.substring(5);
-    buscarCEP();
-  } else {
-    // Enquanto digita, mostra só os números (sem traço parcial)
-    el.value=raw;
-  }
+  if(raw.length>8) raw=raw.substring(0,8);
+  const formatted=raw.length===8 ? raw.substring(0,5)+'-'+raw.substring(5) : raw;
+  // só atualiza o campo se o valor formatado for diferente do atual
+  // evita disparar novo evento 'input' e loop infinito
+  if(el.value!==formatted) el.value=formatted;
+  if(raw.length===8) buscarCEP();
 }
 
 // ─── NAVEGAÇÃO ──────────────────────────────────────
@@ -678,7 +674,7 @@ async function buscarCEP(){
   const st=document.getElementById('cep-status');
   st.textContent='Buscando...';st.className='text-xs mt-1 text-gray-400 animate-pulse2';
   try{
-    const{data}=await axios.get('https://viacep.com.br/ws/'+cep+'/json/');
+    const{data}=await axios.get('/api/cep/'+cep);
     if(data.erro){st.textContent='CEP não encontrado';st.className='text-xs mt-1 text-red-500';return;}
     document.getElementById('emp-logradouro').value=data.logradouro||'';
     document.getElementById('emp-bairro').value=data.bairro||'';
@@ -1258,6 +1254,20 @@ app.get('/api/frete', (c) => {
   if (!cep || cep.replace(/\D/g,'').length !== 8) return c.json({ error: 'CEP inválido' }, 400)
   const opcoes = calcularFretePorCEP(cep)
   return c.json({ cep, opcoes })
+})
+
+// ─── API CEP (proxy ViaCEP — evita CORS no cliente) ──────────────────────────
+app.get('/api/cep/:cep', async (c) => {
+  const cep = c.req.param('cep').replace(/\D/g, '')
+  if (cep.length !== 8) return c.json({ error: 'CEP inválido' }, 400)
+  try {
+    const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`)
+    const data = await res.json() as any
+    if (data.erro) return c.json({ error: 'CEP não encontrado' }, 404)
+    return c.json(data)
+  } catch (e) {
+    return c.json({ error: 'Erro ao consultar CEP' }, 500)
+  }
 })
 
 // ─── API EMPRÉSTIMOS ──────────────────────────────────────────────────────────
