@@ -74,9 +74,33 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
           <input id="search-global" type="text" placeholder="Buscar livros, autores..."
             class="pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm w-64 bg-gray-50 transition-all duration-200 focus:bg-white focus:w-80"/>
         </div>
-        <button onclick="openModal('modal-livro')" class="bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
+        <!-- Botão Novo Livro — só admin -->
+        <button id="btn-novo-livro" onclick="openModal('modal-livro')" class="hidden bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
           <i class="fas fa-plus"></i><span class="hidden sm:inline">Novo Livro</span>
         </button>
+        <!-- Estado não logado -->
+        <button id="btn-header-login" onclick="openModal('modal-login')" class="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+          <i class="fas fa-user-lock"></i><span class="hidden sm:inline">Entrar</span>
+        </button>
+        <!-- Estado logado -->
+        <div id="btn-header-user" class="hidden relative">
+          <button onclick="toggleUserMenu()" class="flex items-center gap-2 px-3 py-2 bg-violet-50 border border-violet-200 rounded-lg text-sm text-violet-700 hover:bg-violet-100 transition-colors">
+            <i class="fas fa-user-shield"></i>
+            <span id="header-user-nome" class="hidden sm:inline font-medium"></span>
+            <i class="fas fa-chevron-down text-xs"></i>
+          </button>
+          <div id="user-menu" class="hidden absolute right-0 top-12 bg-white border border-gray-200 rounded-xl shadow-lg w-52 z-50 overflow-hidden">
+            <div class="px-4 py-3 border-b border-gray-100 bg-gray-50">
+              <p class="text-xs text-gray-500">Logado como</p>
+              <p id="menu-user-email" class="text-sm font-semibold text-gray-800 truncate"></p>
+            </div>
+            <ul class="p-1">
+              <li><button onclick="abrirTrocarSenha()" class="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"><i class="fas fa-key w-4 text-center text-gray-400"></i> Trocar senha</button></li>
+              <li><button onclick="setView('configuracoes')" class="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"><i class="fas fa-gear w-4 text-center text-gray-400"></i> Configurações</button></li>
+              <li class="border-t border-gray-100 mt-1 pt-1"><button onclick="fazerLogout()" class="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg"><i class="fas fa-sign-out-alt w-4 text-center"></i> Sair</button></li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -345,6 +369,79 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
   </div>
 </div>
 
+<!-- Modal Login -->
+<div id="modal-login" class="modal-overlay fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+  <div class="modal-box bg-white rounded-2xl shadow-2xl w-full max-w-sm">
+    <div class="p-6 text-center border-b border-gray-100">
+      <div class="w-14 h-14 bg-violet-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
+        <i class="fas fa-user-shield text-violet-600 text-2xl"></i>
+      </div>
+      <h3 class="font-serif text-xl font-bold text-gray-800">Área Administrativa</h3>
+      <p class="text-sm text-gray-500 mt-1">Entre com suas credenciais de administrador</p>
+    </div>
+    <form id="form-login" onsubmit="fazerLogin(event)" class="p-6 space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+        <input id="login-email" type="email" required placeholder="admin@beserra.com" autocomplete="email"
+          class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition"/>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+        <div class="relative">
+          <input id="login-senha" type="password" required placeholder="••••••••" autocomplete="current-password"
+            class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition pr-10"/>
+          <button type="button" onclick="toggleSenhaVis('login-senha')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+            <i class="fas fa-eye text-sm"></i>
+          </button>
+        </div>
+      </div>
+      <p id="login-erro" class="text-xs text-red-600 hidden"></p>
+      <button type="submit" id="btn-login-submit" class="w-full bg-violet-600 hover:bg-violet-700 text-white py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-colors">
+        <i class="fas fa-sign-in-alt"></i> Entrar
+      </button>
+      <button type="button" onclick="closeModal('modal-login')" class="w-full text-sm text-gray-500 hover:text-gray-700 py-1">Cancelar</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Trocar Senha -->
+<div id="modal-senha" class="modal-overlay fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+  <div class="modal-box bg-white rounded-2xl shadow-2xl w-full max-w-sm">
+    <div class="flex items-center justify-between p-6 border-b border-gray-100">
+      <h3 class="font-serif text-lg font-bold text-gray-800"><i class="fas fa-key text-violet-500 mr-2"></i>Trocar Senha</h3>
+      <button onclick="closeModal('modal-senha')" class="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100"><i class="fas fa-times"></i></button>
+    </div>
+    <form id="form-senha" onsubmit="trocarSenha(event)" class="p-6 space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Senha atual</label>
+        <div class="relative">
+          <input id="senha-atual" type="password" required placeholder="••••••••"
+            class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition pr-10"/>
+          <button type="button" onclick="toggleSenhaVis('senha-atual')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"><i class="fas fa-eye text-sm"></i></button>
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Nova senha <span class="text-gray-400 font-normal">(mín. 6 caracteres)</span></label>
+        <div class="relative">
+          <input id="senha-nova" type="password" required minlength="6" placeholder="••••••••"
+            class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition pr-10"/>
+          <button type="button" onclick="toggleSenhaVis('senha-nova')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"><i class="fas fa-eye text-sm"></i></button>
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Confirmar nova senha</label>
+        <input id="senha-confirma" type="password" required minlength="6" placeholder="••••••••"
+          class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition"/>
+      </div>
+      <p id="senha-erro" class="text-xs text-red-600 hidden"></p>
+      <div class="flex gap-3 pt-1">
+        <button type="button" onclick="closeModal('modal-senha')" class="flex-1 border border-gray-200 text-gray-600 rounded-xl py-2.5 text-sm hover:bg-gray-50">Cancelar</button>
+        <button type="submit" class="flex-1 bg-violet-600 hover:bg-violet-700 text-white rounded-xl py-2.5 text-sm font-semibold">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- Modal Detalhes Livro -->
 <div id="modal-detalhe" class="modal-overlay fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
   <div class="modal-box bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
@@ -498,6 +595,124 @@ let searchTimeout = null;
 let selectedFreteOpcao = null;
 let currentLivroId = null;
 let currentEmprestimoId = null;
+let currentUser = null; // null = visitante, objeto = admin logado
+
+// ─── AUTH FRONTEND ──────────────────────────────────
+async function checkAuth(){
+  try{
+    const{data}=await axios.get('/api/auth/me');
+    currentUser = data.authenticated ? data.user : null;
+  }catch(e){ currentUser = null; }
+  aplicarPermissoes();
+}
+
+function aplicarPermissoes(){
+  const isAdmin = !!currentUser;
+
+  // Header: mostra/oculta botões
+  document.getElementById('btn-header-login').classList.toggle('hidden', isAdmin);
+  document.getElementById('btn-header-user').classList.toggle('hidden', !isAdmin);
+  document.getElementById('btn-novo-livro').classList.toggle('hidden', !isAdmin);
+  if(isAdmin){
+    document.getElementById('header-user-nome').textContent = currentUser.nome;
+    document.getElementById('menu-user-email').textContent = currentUser.email;
+  }
+
+  // Sidebar: oculta abas admin para visitantes
+  const adminNavs = ['nav-emprestimos','nav-autores','nav-categorias','nav-configuracoes'];
+  adminNavs.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.closest('li').classList.toggle('hidden', !isAdmin);
+  });
+
+  // Re-renderiza livros para mostrar/ocultar botões de edição
+  if(allLivros.length) renderLivros(allLivros);
+  if(allEmprestimos.length) renderEmprestimos(allEmprestimos);
+}
+
+async function fazerLogin(e){
+  e.preventDefault();
+  const btn = document.getElementById('btn-login-submit');
+  const erro = document.getElementById('login-erro');
+  erro.classList.add('hidden');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
+  try{
+    const{data}=await axios.post('/api/auth/login',{
+      email: document.getElementById('login-email').value.trim(),
+      senha: document.getElementById('login-senha').value
+    });
+    currentUser = data.user;
+    closeModal('modal-login');
+    document.getElementById('form-login').reset();
+    aplicarPermissoes();
+    showToast('Bem-vindo, '+data.user.nome+'!');
+    // Se estiver numa view restrita, vai para livros
+    setView('livros');
+  }catch(err){
+    const msg = err.response?.data?.error || 'Erro ao fazer login';
+    erro.textContent = msg;
+    erro.classList.remove('hidden');
+  }finally{
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+  }
+}
+
+async function fazerLogout(){
+  try{ await axios.post('/api/auth/logout'); }catch(e){}
+  currentUser = null;
+  aplicarPermissoes();
+  setView('livros');
+  toggleUserMenu(true);
+  showToast('Sessão encerrada','info');
+}
+
+function toggleUserMenu(forceClose=false){
+  const menu = document.getElementById('user-menu');
+  if(forceClose){ menu.classList.add('hidden'); return; }
+  menu.classList.toggle('hidden');
+}
+
+// Fecha menu ao clicar fora
+document.addEventListener('click', e => {
+  const userBtn = document.getElementById('btn-header-user');
+  if(userBtn && !userBtn.contains(e.target)){
+    document.getElementById('user-menu')?.classList.add('hidden');
+  }
+});
+
+function abrirTrocarSenha(){
+  toggleUserMenu(true);
+  document.getElementById('form-senha').reset();
+  document.getElementById('senha-erro').classList.add('hidden');
+  openModal('modal-senha');
+}
+
+async function trocarSenha(e){
+  e.preventDefault();
+  const erro = document.getElementById('senha-erro');
+  erro.classList.add('hidden');
+  const nova  = document.getElementById('senha-nova').value;
+  const conf  = document.getElementById('senha-confirma').value;
+  if(nova !== conf){ erro.textContent='As senhas não coincidem'; erro.classList.remove('hidden'); return; }
+  try{
+    await axios.put('/api/auth/senha',{
+      senha_atual: document.getElementById('senha-atual').value,
+      senha_nova:  nova
+    });
+    closeModal('modal-senha');
+    showToast('Senha alterada com sucesso!');
+  }catch(err){
+    erro.textContent = err.response?.data?.error || 'Erro ao trocar senha';
+    erro.classList.remove('hidden');
+  }
+}
+
+function toggleSenhaVis(id){
+  const el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
 
 // ─── UTILS ──────────────────────────────────────────
 function showToast(msg, type='success') {
@@ -603,6 +818,11 @@ function atualizarPreviewPix(data){
 
 // ─── NAVEGAÇÃO ──────────────────────────────────────
 function setView(view){
+  const adminViews = ['emprestimos','autores','categorias','configuracoes'];
+  if(adminViews.includes(view) && !currentUser){
+    openModal('modal-login');
+    return;
+  }
   ['livros','emprestimos','autores','categorias','configuracoes'].forEach(v=>{
     document.getElementById('view-'+v).classList.toggle('hidden',v!==view);
     const nav=document.getElementById('nav-'+v);
@@ -668,8 +888,7 @@ function renderLivros(livros){
             <span class="text-xs text-gray-400">\${l.ano_publicacao||''}\${l.editora?' · '+l.editora:''}</span>
             <div class="flex gap-1">
               \${l.status==='disponivel'?\`<button onclick="event.stopPropagation();solicitarEmprestimo(\${l.id})" title="Solicitar Empréstimo" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50"><i class="fas fa-handshake text-xs"></i></button>\`:''}
-              <button onclick="event.stopPropagation();editLivro(\${l.id})" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-violet-600 hover:bg-violet-50"><i class="fas fa-edit text-xs"></i></button>
-              <button onclick="event.stopPropagation();deleteLivro(\${l.id},'\${l.titulo.replace(/'/g,'')}')" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50"><i class="fas fa-trash text-xs"></i></button>
+              \${currentUser?\`<button onclick="event.stopPropagation();editLivro(\${l.id})" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-violet-600 hover:bg-violet-50"><i class="fas fa-edit text-xs"></i></button><button onclick="event.stopPropagation();deleteLivro(\${l.id},'\${l.titulo.replace(/'/g,'')}')" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50"><i class="fas fa-trash text-xs"></i></button>\`:''}
             </div>
           </div>
         </div>
@@ -684,8 +903,7 @@ function renderLivros(livros){
         <div class="flex-shrink-0">\${statusBadge(l.status)}</div>
         <div class="flex gap-1 flex-shrink-0">
           \${l.status==='disponivel'?\`<button onclick="event.stopPropagation();solicitarEmprestimo(\${l.id})" title="Solicitar Empréstimo" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50"><i class="fas fa-handshake text-xs"></i></button>\`:''}
-          <button onclick="event.stopPropagation();editLivro(\${l.id})" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-violet-600 hover:bg-violet-50"><i class="fas fa-edit text-xs"></i></button>
-          <button onclick="event.stopPropagation();deleteLivro(\${l.id},'\${l.titulo.replace(/'/g,'')}')" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50"><i class="fas fa-trash text-xs"></i></button>
+          \${currentUser?\`<button onclick="event.stopPropagation();editLivro(\${l.id})" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-violet-600 hover:bg-violet-50"><i class="fas fa-edit text-xs"></i></button><button onclick="event.stopPropagation();deleteLivro(\${l.id},'\${l.titulo.replace(/'/g,'')}')" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50"><i class="fas fa-trash text-xs"></i></button>\`:''}
         </div>
       </article>\`).join('');
   }
@@ -720,8 +938,7 @@ async function viewLivro(id){
       \${l.sinopse?\`<div class="mt-4"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Sinopse</p><p class="text-sm text-gray-600 leading-relaxed">\${l.sinopse}</p></div>\`:''}
       <div class="mt-5 flex gap-3">
         \${l.status==='disponivel'?\`<button onclick="closeModal('modal-detalhe');solicitarEmprestimo(\${l.id})" class="flex-1 bg-green-600 hover:bg-green-700 text-white rounded-lg py-2 text-sm font-medium"><i class="fas fa-handshake mr-2"></i>Solicitar Empréstimo</button>\`:\`<div class="flex-1 bg-gray-100 text-gray-400 rounded-lg py-2 text-sm font-medium text-center cursor-not-allowed">Livro indisponível</div>\`}
-        <button onclick="closeModal('modal-detalhe');editLivro(\${l.id})" class="flex-1 border border-violet-200 text-violet-600 rounded-lg py-2 text-sm font-medium hover:bg-violet-50"><i class="fas fa-edit mr-2"></i>Editar</button>
-        <button onclick="closeModal('modal-detalhe');deleteLivro(\${l.id},'\${l.titulo.replace(/'/g,'')}')" class="border border-red-200 text-red-600 rounded-lg py-2 px-4 text-sm font-medium hover:bg-red-50"><i class="fas fa-trash"></i></button>
+        \${currentUser?\`<button onclick="closeModal('modal-detalhe');editLivro(\${l.id})" class="flex-1 border border-violet-200 text-violet-600 rounded-lg py-2 text-sm font-medium hover:bg-violet-50"><i class="fas fa-edit mr-2"></i>Editar</button><button onclick="closeModal('modal-detalhe');deleteLivro(\${l.id},'\${l.titulo.replace(/'/g,'')}')" class="border border-red-200 text-red-600 rounded-lg py-2 px-4 text-sm font-medium hover:bg-red-50"><i class="fas fa-trash"></i></button>\`:''}
       </div>\`;
     openModal('modal-detalhe');
   }catch(e){showToast('Erro ao carregar detalhes','error')}
@@ -1190,8 +1407,7 @@ async function loadAutores(selectOnly=false){
         <div class="w-12 h-12 bg-violet-100 rounded-full flex items-center justify-center flex-shrink-0"><span class="font-serif text-violet-600 text-xl font-bold">\${a.nome[0]}</span></div>
         <div class="flex-1 min-w-0"><h3 class="font-semibold text-gray-800 truncate">\${a.nome}</h3><p class="text-sm text-gray-400">\${a.nacionalidade||'Não informada'}</p><p class="text-xs text-violet-500 mt-0.5">\${a.total_livros||0} livro(s)</p></div>
         <div class="flex gap-1">
-          <button onclick="editAutor(\${a.id})" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-violet-600 hover:bg-violet-50"><i class="fas fa-edit text-xs"></i></button>
-          <button onclick="deleteAutor(\${a.id},'\${a.nome.replace(/'/g,'')}')" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50"><i class="fas fa-trash text-xs"></i></button>
+          \${currentUser?\`<button onclick="editAutor(\${a.id})" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-violet-600 hover:bg-violet-50"><i class="fas fa-edit text-xs"></i></button><button onclick="deleteAutor(\${a.id},'\${a.nome.replace(/'/g,'')}')" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50"><i class="fas fa-trash text-xs"></i></button>\`:''}
         </div>
       </div>\`).join('');
   }catch(e){showToast('Erro ao carregar autores','error')}
@@ -1228,8 +1444,7 @@ async function loadCategorias(selectOnly=false){
         <div class="flex items-center justify-between mb-3">
           <span class="text-xs font-bold px-2.5 py-1 rounded-full \${colors[i%colors.length]}">\${c.nome}</span>
           <div class="flex gap-1">
-            <button onclick="editCategoria(\${c.id})" class="w-7 h-7 flex items-center justify-center rounded-lg text-gray-400 hover:text-violet-600 hover:bg-violet-50"><i class="fas fa-edit text-xs"></i></button>
-            <button onclick="deleteCategoria(\${c.id},'\${c.nome.replace(/'/g,'')}')" class="w-7 h-7 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50"><i class="fas fa-trash text-xs"></i></button>
+            \${currentUser?\`<button onclick="editCategoria(\${c.id})" class="w-7 h-7 flex items-center justify-center rounded-lg text-gray-400 hover:text-violet-600 hover:bg-violet-50"><i class="fas fa-edit text-xs"></i></button><button onclick="deleteCategoria(\${c.id},'\${c.nome.replace(/'/g,'')}')" class="w-7 h-7 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50"><i class="fas fa-trash text-xs"></i></button>\`:''}
           </div>
         </div>
         <p class="text-sm text-gray-500">\${c.descricao||'Sem descrição'}</p>
@@ -1269,7 +1484,7 @@ async function init(){
   await Promise.all([loadAutores(true),loadCategorias(true)]);
   await Promise.all([loadLivros(),loadBadgeEmprestimos()]);
 }
-document.addEventListener('DOMContentLoaded',init);
+document.addEventListener('DOMContentLoaded', async ()=>{ await checkAuth(); init(); });
 </script>
 </body>
 </html>`))
@@ -1314,6 +1529,17 @@ app.use('/api/*', async (c, next) => {
       valor TEXT NOT NULL,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`).run()
+    await DB.prepare(`CREATE TABLE IF NOT EXISTS usuarios (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nome TEXT NOT NULL,
+      email TEXT UNIQUE NOT NULL,
+      senha_hash TEXT NOT NULL,
+      role TEXT DEFAULT 'admin' CHECK(role IN ('admin')),
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`).run()
+    // Seed: admin padrão (senha: admin123) — hash SHA-256 simples
+    await DB.prepare(`INSERT OR IGNORE INTO usuarios (nome, email, senha_hash, role)
+      VALUES ('Administrador', 'admin@beserra.com', 'admin123_CHANGE_ME', 'admin')`).run()
 
     // Seed sempre via INSERT OR IGNORE (idempotente)
     const cats = [['Romance','Livros de ficção romântica'],['Ficção Científica','Livros de aventura científica'],['Terror','Livros de suspense e horror'],['Fantasia','Mundos e criaturas fantásticas'],['Biografia','Histórias de vida reais'],['História','Eventos e períodos históricos'],['Autoajuda','Desenvolvimento pessoal'],['Clássico','Obras clássicas da literatura']]
@@ -1445,6 +1671,114 @@ function calcularFretePorCEP(cep: string): Array<{nome: string, codigo: string, 
   ]
 }
 
+// ─── AUTH HELPERS ─────────────────────────────────────────────────────────────
+const JWT_SECRET = 'beserra-library-secret-2024'
+
+async function hashSenha(senha: string): Promise<string> {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(senha + JWT_SECRET))
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('')
+}
+
+async function gerarToken(payload: Record<string, unknown>): Promise<string> {
+  const header  = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
+  const body    = btoa(JSON.stringify({ ...payload, iat: Date.now() }))
+  const sig     = await crypto.subtle.digest('SHA-256',
+    new TextEncoder().encode(`${header}.${body}.${JWT_SECRET}`))
+  const sigHex  = Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2,'0')).join('')
+  return `${header}.${body}.${sigHex}`
+}
+
+function verificarToken(token: string): Record<string, any> | null {
+  try {
+    const parts = token.split('.')
+    if (parts.length !== 3) return null
+    const payload = JSON.parse(atob(parts[1]))
+    // token válido por 12h
+    if (Date.now() - payload.iat > 12 * 60 * 60 * 1000) return null
+    return payload
+  } catch { return null }
+}
+
+function getTokenFromRequest(c: any): string | null {
+  // Cookie httpOnly
+  const cookieHeader = c.req.header('Cookie') || ''
+  const match = cookieHeader.match(/bl_token=([^;]+)/)
+  if (match) return match[1]
+  // Authorization Bearer (fallback para chamadas diretas)
+  const auth = c.req.header('Authorization') || ''
+  if (auth.startsWith('Bearer ')) return auth.slice(7)
+  return null
+}
+
+async function requireAdmin(c: any, next: any) {
+  const token = getTokenFromRequest(c)
+  if (!token) return c.json({ error: 'Não autorizado. Faça login.' }, 401)
+  const payload = verificarToken(token)
+  if (!payload) return c.json({ error: 'Sessão expirada. Faça login novamente.' }, 401)
+  c.set('adminUser', payload)
+  await next()
+}
+
+// ─── API AUTH ─────────────────────────────────────────────────────────────────
+app.post('/api/auth/login', async (c) => {
+  const { DB } = c.env
+  const { email, senha } = await c.req.json() as { email: string, senha: string }
+  if (!email || !senha) return c.json({ error: 'E-mail e senha são obrigatórios' }, 400)
+
+  const user = await DB.prepare('SELECT * FROM usuarios WHERE email=?')
+    .bind(email.toLowerCase().trim()).first<any>()
+  if (!user) return c.json({ error: 'E-mail ou senha incorretos' }, 401)
+
+  // Suporta senha em texto puro (primeira vez) e hash
+  const hash = await hashSenha(senha)
+  const senhaOk = user.senha_hash === hash || user.senha_hash === senha
+  if (!senhaOk) return c.json({ error: 'E-mail ou senha incorretos' }, 401)
+
+  // Se estava em texto puro, atualiza para hash
+  if (user.senha_hash === senha) {
+    await DB.prepare('UPDATE usuarios SET senha_hash=? WHERE id=?').bind(hash, user.id).run()
+  }
+
+  const token = await gerarToken({ id: user.id, nome: user.nome, email: user.email, role: user.role })
+
+  // Define cookie httpOnly com 12h de expiração
+  c.header('Set-Cookie',
+    `bl_token=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=43200`)
+  return c.json({ ok: true, user: { id: user.id, nome: user.nome, email: user.email, role: user.role } })
+})
+
+app.post('/api/auth/logout', (c) => {
+  c.header('Set-Cookie', 'bl_token=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0')
+  return c.json({ ok: true })
+})
+
+app.get('/api/auth/me', (c) => {
+  const token = getTokenFromRequest(c)
+  if (!token) return c.json({ authenticated: false })
+  const payload = verificarToken(token)
+  if (!payload) return c.json({ authenticated: false })
+  return c.json({ authenticated: true, user: { id: payload.id, nome: payload.nome, email: payload.email, role: payload.role } })
+})
+
+app.put('/api/auth/senha', async (c) => {
+  const token = getTokenFromRequest(c)
+  if (!token) return c.json({ error: 'Não autorizado' }, 401)
+  const payload = verificarToken(token)
+  if (!payload) return c.json({ error: 'Sessão expirada' }, 401)
+  const { DB } = c.env
+  const { senha_atual, senha_nova } = await c.req.json() as any
+  if (!senha_atual || !senha_nova) return c.json({ error: 'Informe a senha atual e a nova senha' }, 400)
+  if (senha_nova.length < 6) return c.json({ error: 'Nova senha deve ter pelo menos 6 caracteres' }, 400)
+  const user = await DB.prepare('SELECT * FROM usuarios WHERE id=?').bind(payload.id).first<any>()
+  if (!user) return c.json({ error: 'Usuário não encontrado' }, 404)
+  const hashAtual = await hashSenha(senha_atual)
+  if (user.senha_hash !== hashAtual && user.senha_hash !== senha_atual)
+    return c.json({ error: 'Senha atual incorreta' }, 401)
+  const hashNova = await hashSenha(senha_nova)
+  await DB.prepare('UPDATE usuarios SET senha_hash=? WHERE id=?').bind(hashNova, payload.id).run()
+  return c.json({ ok: true })
+})
+
 // ─── API FRETE ────────────────────────────────────────────────────────────────
 app.get('/api/frete', (c) => {
   const cep = c.req.query('cep') || ''
@@ -1487,6 +1821,7 @@ app.get('/api/emprestimos/:id', async (c) => {
   return c.json(emp)
 })
 
+// empréstimos: criação é pública (qualquer um pode pedir), gestão exige admin
 app.post('/api/emprestimos', async (c) => {
   const { DB } = c.env
   const body = await c.req.json()
@@ -1528,7 +1863,7 @@ app.post('/api/emprestimos', async (c) => {
   }, 201)
 })
 
-app.patch('/api/emprestimos/:id/status', async (c) => {
+app.patch('/api/emprestimos/:id/status', requireAdmin, async (c) => {
   const { DB } = c.env
   const id = c.req.param('id')
   const { status, rastreamento } = await c.req.json()
@@ -1572,7 +1907,7 @@ app.get('/api/livros/:id', async (c) => {
   return c.json(livro)
 })
 
-app.post('/api/livros', async (c) => {
+app.post('/api/livros', requireAdmin, async (c) => {
   const { DB } = c.env
   const body = await c.req.json()
   const { titulo, isbn, ano_publicacao, editora, paginas, sinopse, capa_url, status, autor_id, categoria_id } = body
@@ -1586,7 +1921,7 @@ app.post('/api/livros', async (c) => {
   }
 })
 
-app.put('/api/livros/:id', async (c) => {
+app.put('/api/livros/:id', requireAdmin, async (c) => {
   const { DB } = c.env
   const body = await c.req.json()
   const { titulo, isbn, ano_publicacao, editora, paginas, sinopse, capa_url, status, autor_id, categoria_id } = body
@@ -1600,7 +1935,7 @@ app.put('/api/livros/:id', async (c) => {
   }
 })
 
-app.delete('/api/livros/:id', async (c) => {
+app.delete('/api/livros/:id', requireAdmin, async (c) => {
   const { DB } = c.env
   await DB.prepare('DELETE FROM livros WHERE id=?').bind(c.req.param('id')).run()
   return c.json({ message: 'Excluído' })
@@ -1618,21 +1953,21 @@ app.get('/api/autores/:id', async (c) => {
   if (!a) return c.json({ error: 'Não encontrado' }, 404)
   return c.json(a)
 })
-app.post('/api/autores', async (c) => {
+app.post('/api/autores', requireAdmin, async (c) => {
   const { DB } = c.env
   const { nome, nacionalidade } = await c.req.json()
   if (!nome) return c.json({ error: 'Nome obrigatório' }, 400)
   const r = await DB.prepare('INSERT INTO autores (nome,nacionalidade) VALUES (?,?)').bind(nome, nacionalidade||null).run()
   return c.json({ id: r.meta.last_row_id }, 201)
 })
-app.put('/api/autores/:id', async (c) => {
+app.put('/api/autores/:id', requireAdmin, async (c) => {
   const { DB } = c.env
   const { nome, nacionalidade } = await c.req.json()
   if (!nome) return c.json({ error: 'Nome obrigatório' }, 400)
   await DB.prepare('UPDATE autores SET nome=?,nacionalidade=? WHERE id=?').bind(nome, nacionalidade||null, c.req.param('id')).run()
   return c.json({ message: 'Atualizado' })
 })
-app.delete('/api/autores/:id', async (c) => {
+app.delete('/api/autores/:id', requireAdmin, async (c) => {
   const { DB } = c.env
   const u = await DB.prepare('SELECT COUNT(*) as n FROM livros WHERE autor_id=?').bind(c.req.param('id')).first<{n:number}>()
   if (u && u.n > 0) return c.json({ error: 'Autor possui livros. Remova-os primeiro.' }, 409)
@@ -1652,7 +1987,7 @@ app.get('/api/categorias/:id', async (c) => {
   if (!cat) return c.json({ error: 'Não encontrado' }, 404)
   return c.json(cat)
 })
-app.post('/api/categorias', async (c) => {
+app.post('/api/categorias', requireAdmin, async (c) => {
   const { DB } = c.env
   const { nome, descricao } = await c.req.json()
   if (!nome) return c.json({ error: 'Nome obrigatório' }, 400)
@@ -1664,14 +1999,14 @@ app.post('/api/categorias', async (c) => {
     return c.json({ error: 'Erro' }, 500)
   }
 })
-app.put('/api/categorias/:id', async (c) => {
+app.put('/api/categorias/:id', requireAdmin, async (c) => {
   const { DB } = c.env
   const { nome, descricao } = await c.req.json()
   if (!nome) return c.json({ error: 'Nome obrigatório' }, 400)
   await DB.prepare('UPDATE categorias SET nome=?,descricao=? WHERE id=?').bind(nome, descricao||null, c.req.param('id')).run()
   return c.json({ message: 'Atualizado' })
 })
-app.delete('/api/categorias/:id', async (c) => {
+app.delete('/api/categorias/:id', requireAdmin, async (c) => {
   const { DB } = c.env
   const u = await DB.prepare('SELECT COUNT(*) as n FROM livros WHERE categoria_id=?').bind(c.req.param('id')).first<{n:number}>()
   if (u && u.n > 0) return c.json({ error: 'Categoria possui livros. Remova-os primeiro.' }, 409)
@@ -1680,7 +2015,7 @@ app.delete('/api/categorias/:id', async (c) => {
 })
 
 // ─── API CONFIGURAÇÕES ADMIN ──────────────────────────────────────────────────
-app.get('/api/admin/config', async (c) => {
+app.get('/api/admin/config', requireAdmin, async (c) => {
   const { DB } = c.env
   const rows = await DB.prepare('SELECT chave, valor FROM configuracoes').all<{chave:string, valor:string}>()
   const config: Record<string,string> = {}
@@ -1688,7 +2023,7 @@ app.get('/api/admin/config', async (c) => {
   return c.json(config)
 })
 
-app.put('/api/admin/config', async (c) => {
+app.put('/api/admin/config', requireAdmin, async (c) => {
   const { DB } = c.env
   const body = await c.req.json() as Record<string,string>
   for (const [chave, valor] of Object.entries(body)) {
