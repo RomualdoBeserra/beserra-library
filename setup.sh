@@ -3,6 +3,11 @@
 #  Beserra Library — Script de instalação para Google Cloud VM
 #  Ubuntu 22.04 LTS
 #  Uso: bash setup.sh [--repo URL_DO_GITHUB] [--domain SEU_DOMINIO]
+#
+#  SEGURANÇA DO BANCO DE DADOS:
+#  ✔ O banco (.wrangler/state) NUNCA é apagado automaticamente
+#  ✔ Ao atualizar o código, o banco existente é PRESERVADO
+#  ✔ Backups automáticos diários às 02:00
 # ============================================================
 
 set -e  # Para imediatamente em qualquer erro
@@ -101,52 +106,179 @@ fi
 sudo systemctl enable nginx
 sudo systemctl start nginx
 
-# ── 5. Clonar ou copiar o projeto ────────────────────────────
+# ── 5. Clonar ou atualizar o projeto ─────────────────────────
 section "5/8 — Configurando projeto"
 
-if [ -d "$APP_DIR" ]; then
-  warn "Diretório $APP_DIR já existe."
-  read -rp "  Deseja sobrescrever? (s/N): " OVERWRITE
-  if [[ "$OVERWRITE" =~ ^[Ss]$ ]]; then
-    # Para o PM2 se estiver rodando
-    pm2 stop biblioteca 2>/dev/null || true
-    pm2 delete biblioteca 2>/dev/null || true
-    # Faz backup do banco antes de sobrescrever
-    if [ -d "$APP_DIR/.wrangler" ]; then
-      BACKUP_FILE="$HOME/backup-db-$(date +%Y%m%d_%H%M%S).tar.gz"
-      tar -czf "$BACKUP_FILE" -C "$APP_DIR" .wrangler/state 2>/dev/null || true
-      log "Backup do banco salvo em: $BACKUP_FILE"
-    fi
-    rm -rf "$APP_DIR"
-  else
-    info "Usando diretório existente. Fazendo pull..."
-    cd "$APP_DIR"
-    git pull 2>/dev/null || true
+# ════════════════════════════════════════════════════════════
+#  PROTEÇÃO DO BANCO DE DADOS
+#  O banco fica em $APP_DIR/.wrangler/state/
+#  Esta pasta NUNCA é apagada pelo script — mesmo ao atualizar
+# ════════════════════════════════════════════════════════════
+
+DB_DIR="$APP_DIR/.wrangler/state"
+DB_BACKUP=""
+
+# Função: fazer backup do banco se existir
+fazer_backup_banco() {
+  if [ -d "$DB_DIR" ]; then
+    mkdir -p "$HOME/backups"
+    DB_BACKUP="$HOME/backups/db-pre-update-$(date +%Y%m%d_%H%M%S).tar.gz"
+    tar -czf "$DB_BACKUP" -C "$APP_DIR" .wrangler/state 2>/dev/null || true
+    echo ""
+    echo -e "${GREEN}${BOLD}  💾 Backup do banco criado: ${DB_BACKUP}${NC}"
+    echo ""
   fi
+}
+
+# Função: restaurar banco após update de código
+restaurar_banco() {
+  if [ -n "$DB_BACKUP" ] && [ -f "$DB_BACKUP" ]; then
+    # Remove apenas os arquivos de código, preserva .wrangler
+    info "Restaurando banco de dados preservado..."
+    mkdir -p "$APP_DIR/.wrangler"
+    tar -xzf "$DB_BACKUP" -C "$APP_DIR" 2>/dev/null || true
+    log "Banco de dados restaurado com sucesso"
+  fi
+}
+
+if [ -d "$APP_DIR" ]; then
+  # ── Instalação já existe ──────────────────────────────────
+  echo ""
+  echo -e "${YELLOW}${BOLD}  O diretório $APP_DIR já existe.${NC}"
+  echo -e "${YELLOW}  Escolha uma opção:${NC}"
+  echo -e "  ${BOLD}[1]${NC} Atualizar código (mantém banco de dados) ${GREEN}← RECOMENDADO${NC}"
+  echo -e "  ${BOLD}[2]${NC} Reinstalar tudo (apaga TUDO incluindo banco) ${RED}← PERIGO${NC}"
+  echo -e "  ${BOLD}[3]${NC} Cancelar"
+  echo ""
+  read -rp "  Opção [1/2/3] (padrão: 1): " OPCAO
+  OPCAO="${OPCAO:-1}"
+
+  case "$OPCAO" in
+    1)
+      # ── ATUALIZAR CÓDIGO — BANCO PRESERVADO ──────────────
+      echo ""
+      echo -e "${GREEN}${BOLD}  Modo: Atualizar código — banco de dados PRESERVADO${NC}"
+      echo ""
+
+      # Para PM2
+      pm2 stop biblioteca 2>/dev/null || true
+
+      # Faz backup preventivo do banco
+      fazer_backup_banco
+
+      if [ -n "$REPO_URL" ]; then
+        # Tem repositório: atualiza via git
+        cd "$APP_DIR"
+        # Configura remote se não existir
+        if ! git remote get-url origin &>/dev/null; then
+          git remote add origin "$REPO_URL"
+        fi
+
+        # Salva o banco temporariamente fora do APP_DIR
+        TMP_DB="/tmp/beserra-db-backup-$$"
+        if [ -d "$DB_DIR" ]; then
+          cp -r "$APP_DIR/.wrangler" "$TMP_DB"
+          log "Banco copiado para área segura temporária"
+        fi
+
+        # Atualiza código
+        git fetch origin
+        git reset --hard origin/main
+        log "Código atualizado do GitHub"
+
+        # Restaura o banco
+        if [ -d "$TMP_DB" ]; then
+          rm -rf "$APP_DIR/.wrangler"
+          cp -r "$TMP_DB" "$APP_DIR/.wrangler"
+          rm -rf "$TMP_DB"
+          log "Banco de dados restaurado após update"
+        fi
+      else
+        # Sem repositório: apenas atualiza dependências e build
+        info "Sem repositório informado. Atualizando dependências e build..."
+        cd "$APP_DIR"
+
+        # Salva banco
+        TMP_DB="/tmp/beserra-db-backup-$$"
+        if [ -d "$DB_DIR" ]; then
+          cp -r "$APP_DIR/.wrangler" "$TMP_DB"
+        fi
+
+        npm install --legacy-peer-deps
+        npm run build
+
+        # Restaura banco
+        if [ -d "$TMP_DB" ]; then
+          rm -rf "$APP_DIR/.wrangler"
+          cp -r "$TMP_DB" "$APP_DIR/.wrangler"
+          rm -rf "$TMP_DB"
+          log "Banco de dados restaurado após build"
+        fi
+      fi
+      ;;
+
+    2)
+      # ── REINSTALAÇÃO TOTAL — PERIGO ───────────────────────
+      echo ""
+      echo -e "${RED}${BOLD}  ⚠ ATENÇÃO: Isso vai APAGAR todos os dados cadastrados!${NC}"
+      echo -e "${RED}  Livros, usuários, empréstimos, configurações PIX — tudo será perdido.${NC}"
+      echo ""
+      read -rp "  Digite CONFIRMAR para prosseguir: " CONFIRMACAO
+      if [ "$CONFIRMACAO" != "CONFIRMAR" ]; then
+        echo -e "${GREEN}  Operação cancelada. Nada foi apagado.${NC}"
+        exit 0
+      fi
+
+      # Faz backup mesmo assim
+      fazer_backup_banco
+      if [ -n "$DB_BACKUP" ]; then
+        echo -e "${YELLOW}  Backup salvo em: $DB_BACKUP${NC}"
+        echo -e "${YELLOW}  Para restaurar: tar -xzf $DB_BACKUP -C $APP_DIR${NC}"
+        echo ""
+      fi
+
+      pm2 stop biblioteca 2>/dev/null || true
+      pm2 delete biblioteca 2>/dev/null || true
+      rm -rf "$APP_DIR"
+      log "Diretório removido"
+      ;;
+
+    3)
+      echo -e "${GREEN}  Operação cancelada.${NC}"
+      exit 0
+      ;;
+
+    *)
+      warn "Opção inválida. Usando opção 1 (atualizar código)."
+      OPCAO=1
+      ;;
+  esac
 fi
 
-if [ -n "$REPO_URL" ] && [ ! -d "$APP_DIR" ]; then
-  info "Clonando repositório: $REPO_URL"
-  git clone "$REPO_URL" "$APP_DIR"
-  log "Repositório clonado"
-elif [ ! -d "$APP_DIR" ]; then
-  # Sem repositório: cria a estrutura mínima para o usuário copiar os arquivos
-  warn "Nenhum repositório informado."
-  info "Criando diretório $APP_DIR..."
-  mkdir -p "$APP_DIR"
-  echo -e "\n${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-  echo -e "${YELLOW} Copie os arquivos do projeto para: $APP_DIR${NC}"
-  echo -e "${YELLOW} Em seguida, execute novamente: bash setup.sh${NC}"
-  echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
-  echo -e "${BOLD}Como enviar os arquivos do seu computador para a VM:${NC}"
-  echo ""
-  echo -e "  ${CYAN}# No seu computador local, execute:${NC}"
-  echo -e "  ${BOLD}gcloud compute scp --recurse ./beserra-library/* beserra-library:$APP_DIR/ --zone=ZONA${NC}"
-  echo ""
-  echo -e "  ${CYAN}# Ou usando scp comum:${NC}"
-  echo -e "  ${BOLD}scp -r ./beserra-library/* usuario@IP_DA_VM:$APP_DIR/${NC}"
-  echo ""
-  exit 0
+# ── Clonar repositório (nova instalação ou reinstalação) ─────
+if [ ! -d "$APP_DIR" ]; then
+  if [ -n "$REPO_URL" ]; then
+    info "Clonando repositório: $REPO_URL"
+    git clone "$REPO_URL" "$APP_DIR"
+    log "Repositório clonado"
+  else
+    warn "Nenhum repositório informado."
+    info "Criando diretório $APP_DIR..."
+    mkdir -p "$APP_DIR"
+    echo -e "\n${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${YELLOW} Copie os arquivos do projeto para: $APP_DIR${NC}"
+    echo -e "${YELLOW} Em seguida, execute novamente: bash setup.sh${NC}"
+    echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
+    echo -e "${BOLD}Como enviar os arquivos do seu computador para a VM:${NC}"
+    echo ""
+    echo -e "  ${CYAN}# No seu computador local, execute:${NC}"
+    echo -e "  ${BOLD}gcloud compute scp --recurse ./beserra-library/* beserra-library:$APP_DIR/ --zone=ZONA${NC}"
+    echo ""
+    echo -e "  ${CYAN}# Ou usando scp comum:${NC}"
+    echo -e "  ${BOLD}scp -r ./beserra-library/* usuario@IP_DA_VM:$APP_DIR/${NC}"
+    echo ""
+    exit 0
+  fi
 fi
 
 # ── 6. Instalar dependências e build ─────────────────────────
@@ -264,7 +396,7 @@ server {
         proxy_read_timeout 60s;
     }
 
-    # Bloquear acesso a arquivos sensíveis
+    # Bloqueia acesso direto ao banco e arquivos sensíveis
     location ~ /\.(git|env|wrangler) {
         deny all;
         return 404;
@@ -382,5 +514,9 @@ fi
 
 echo -e "  ${BOLD}⚙️  Configurar chave PIX:${NC}"
 echo -e "     Acesse ${CYAN}http://${EXTERNAL_IP}${NC} → menu ${BOLD}Configurações${NC}"
+echo ""
+echo -e "  ${BOLD}🔐 Credenciais iniciais:${NC}"
+echo -e "     Email: ${CYAN}admin@beserra.com${NC}"
+echo -e "     Senha: ${CYAN}admin123_CHANGE_ME${NC}  ← troque no primeiro acesso!"
 echo ""
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
