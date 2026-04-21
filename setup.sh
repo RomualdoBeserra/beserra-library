@@ -618,6 +618,37 @@ if [ -n "$DOMAIN" ]; then
   echo -e "     ${CYAN}sudo apt install -y certbot python3-certbot-nginx${NC}"
   echo -e "     ${CYAN}sudo certbot --nginx -d ${DOMAIN}${NC}"
   echo ""
+
+  # ── Instala SSL automaticamente se o domínio foi informado ──
+  section "Configurando HTTPS (Let's Encrypt)"
+  info "Domínio informado: ${DOMAIN}"
+
+  # Instala certbot se necessário
+  if ! command -v certbot &>/dev/null; then
+    info "Instalando certbot..."
+    sudo apt-get install -y certbot python3-certbot-nginx 2>/dev/null || \
+    sudo snap install --classic certbot 2>/dev/null && \
+    sudo ln -sf /snap/bin/certbot /usr/bin/certbot 2>/dev/null || true
+  fi
+
+  # Verifica se o domínio resolve para o IP desta VM
+  VM_IP=$(curl -s ifconfig.me 2>/dev/null || curl -s icanhazip.com 2>/dev/null || echo "")
+  DOMAIN_IP=$(dig +short "${DOMAIN}" 2>/dev/null | tail -1 || nslookup "${DOMAIN}" 2>/dev/null | awk '/Address:/{ip=$2} END{print ip}' || echo "")
+
+  info "IP da VM: ${VM_IP}"
+  info "IP do domínio ${DOMAIN}: ${DOMAIN_IP:-não resolvido}"
+
+  if [ -n "$VM_IP" ] && [ "$VM_IP" = "$DOMAIN_IP" ]; then
+    info "DNS OK — solicitando certificado SSL..."
+    sudo certbot --nginx -d "${DOMAIN}" --non-interactive --agree-tos \
+      --email "admin@${DOMAIN}" --redirect 2>&1 | tail -5 \
+      && log "✅ HTTPS ativado para https://${DOMAIN}" \
+      || warn "Certbot falhou — tente manualmente: sudo certbot --nginx -d ${DOMAIN}"
+  else
+    warn "DNS ainda não propagou (VM=${VM_IP}, Domínio=${DOMAIN_IP:-?})"
+    warn "Quando o DNS estiver apontando para a VM, execute:"
+    echo -e "     ${CYAN}sudo certbot --nginx -d ${DOMAIN} --non-interactive --agree-tos --email admin@${DOMAIN} --redirect${NC}"
+  fi
 fi
 
 echo -e "  ${BOLD}⚙️  Configurar chave PIX:${NC}"
