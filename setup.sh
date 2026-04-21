@@ -283,20 +283,44 @@ section "Configurando memória swap"
 TOTAL_RAM_MB=$(awk '/MemTotal/ {printf "%d", $2/1024}' /proc/meminfo)
 info "RAM disponível: ${TOTAL_RAM_MB} MB"
 
-# Cria swap de 2GB se não existir ou for menor que 1GB
+setup_swap() {
+  local SIZE_MB=$1
+  local SWAPFILE="/swapfile"
+
+  # Remove swap anterior corrompido/inativo
+  if [ -f "$SWAPFILE" ]; then
+    sudo swapoff "$SWAPFILE" 2>/dev/null || true
+    sudo rm -f "$SWAPFILE"
+  fi
+
+  info "Criando swap de ${SIZE_MB}MB com dd (método seguro)..."
+  # dd é mais compatível que fallocate em VMs com disco não-convencional (NFS, CoW, etc.)
+  sudo dd if=/dev/zero of="$SWAPFILE" bs=1M count="$SIZE_MB" status=none
+  if [ $? -ne 0 ]; then
+    warn "Falha ao criar swapfile — continuando sem swap extra"
+    return 1
+  fi
+  sudo chmod 600 "$SWAPFILE"
+  sudo mkswap "$SWAPFILE" -q
+  sudo swapon "$SWAPFILE"
+  grep -q "$SWAPFILE" /etc/fstab || echo "$SWAPFILE none swap sw 0 0" | sudo tee -a /etc/fstab > /dev/null
+  log "Swap de ${SIZE_MB}MB ativado"
+}
+
 SWAP_TOTAL=$(swapon --show=SIZE --noheadings --bytes 2>/dev/null | awk '{sum+=$1} END {printf "%d", sum/1024/1024}')
 if [ "${SWAP_TOTAL:-0}" -lt 1024 ]; then
-  info "Criando swap de 2GB..."
-  sudo fallocate -l 2G /swapfile 2>/dev/null || sudo dd if=/dev/zero of=/swapfile bs=1M count=2048 status=none
-  sudo chmod 600 /swapfile
-  sudo mkswap /swapfile -q
-  sudo swapon /swapfile
-  # Persiste no fstab se ainda não estiver
-  grep -q '/swapfile' /etc/fstab || echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab > /dev/null
-  log "Swap de 2GB ativado"
+  # Tenta 2GB; se falhar por falta de espaço, tenta 1GB
+  setup_swap 2048 || setup_swap 1024 || warn "Não foi possível criar swap — Bus error pode ocorrer em VMs com < 1GB RAM"
 else
   log "Swap já configurado (${SWAP_TOTAL} MB) — OK"
 fi
+
+# Mostra memória total disponível após swap
+FREE_TOTAL=$(free -m | awk '/^Mem/{m=$2} /^Swap/{s=$2} END{print m+s}')
+info "Memória total (RAM + Swap): ${FREE_TOTAL} MB"
+
+# Ajusta vm.swappiness para usar swap mais agressivamente
+sudo sysctl -w vm.swappiness=60 2>/dev/null || true
 
 # ── 6. Instalar dependências e build ─────────────────────────
 section "6/8 — Instalando dependências e fazendo build"
@@ -311,8 +335,32 @@ npm install --legacy-peer-deps
 log "Dependências instaladas"
 
 info "Fazendo build da aplicação..."
-# NODE_OPTIONS limita heap a 512MB para evitar Bus error em VMs com pouca RAM
-NODE_OPTIONS="--max-old-space-size=512" npm run build
+# NODE_OPTIONS limita heap do Node.js para evitar Bus error em VMs com pouca RAM
+# Calcula heap seguro: 40% da RAM total disponível (RAM + swap), máximo 1024MB
+TOTAL_MEM=$(free -m | awk '/^Mem/{m=$2} /^Swap/{s=$2} END{printf "%d", (m+s)*0.4}')
+HEAP_MB=$(( TOTAL_MEM > 1024 ? 1024 : (TOTAL_MEM < 256 ? 256 : TOTAL_MEM) ))
+info "Heap Node.js definido em ${HEAP_MB}MB"
+
+# Tenta o build com retry em caso de falha de memória
+build_with_retry() {
+  local attempt=1
+  local max=3
+  local heap=$1
+  while [ $attempt -le $max ]; do
+    info "Tentativa de build ${attempt}/${max} (heap=${heap}MB)..."
+    NODE_OPTIONS="--max-old-space-size=${heap}" npm run build && return 0
+    warn "Build falhou na tentativa ${attempt}. Aguardando 5s..."
+    sleep 5
+    attempt=$(( attempt + 1 ))
+    heap=$(( heap - 64 ))  # Reduz heap a cada tentativa
+    [ $heap -lt 128 ] && heap=128
+  done
+  return 1
+}
+
+if ! build_with_retry "$HEAP_MB"; then
+  error "Build falhou após 3 tentativas. Verifique a memória disponível com: free -h"
+fi
 log "Build concluído — dist/ gerado"
 
 # ── 7. Configurar PM2 ────────────────────────────────────────
