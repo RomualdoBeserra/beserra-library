@@ -166,54 +166,50 @@ if [ -d "$APP_DIR" ]; then
       # Faz backup preventivo do banco
       fazer_backup_banco
 
+      # Salva o banco temporariamente fora do APP_DIR (independente da fonte)
+      TMP_DB="/tmp/beserra-db-backup-$$"
+      if [ -d "$DB_DIR" ]; then
+        cp -r "$APP_DIR/.wrangler" "$TMP_DB"
+        log "Banco copiado para área segura temporária"
+      fi
+
       if [ -n "$REPO_URL" ]; then
-        # Tem repositório: atualiza via git
-        cd "$APP_DIR"
-        # Configura remote se não existir
-        if ! git remote get-url origin &>/dev/null; then
-          git remote add origin "$REPO_URL"
-        fi
-
-        # Salva o banco temporariamente fora do APP_DIR
-        TMP_DB="/tmp/beserra-db-backup-$$"
-        if [ -d "$DB_DIR" ]; then
-          cp -r "$APP_DIR/.wrangler" "$TMP_DB"
-          log "Banco copiado para área segura temporária"
-        fi
-
-        # Atualiza código
-        git fetch origin
-        git reset --hard origin/main
-        log "Código atualizado do GitHub"
-
-        # Restaura o banco
-        if [ -d "$TMP_DB" ]; then
-          rm -rf "$APP_DIR/.wrangler"
-          cp -r "$TMP_DB" "$APP_DIR/.wrangler"
-          rm -rf "$TMP_DB"
-          log "Banco de dados restaurado após update"
+        # Tem URL de repositório informada
+        if [ -d "$APP_DIR/.git" ]; then
+          # Já é um repo git: atualiza normalmente
+          cd "$APP_DIR"
+          # Garante que o remote aponta para a URL correta
+          git remote set-url origin "$REPO_URL" 2>/dev/null || git remote add origin "$REPO_URL"
+          git fetch origin
+          git reset --hard origin/main
+          log "Código atualizado do GitHub (git pull)"
+        else
+          # Não tem .git: foi enviado via SCP/upload
+          # Clona em pasta temporária e substitui apenas os arquivos de código
+          info "Diretório não é um repositório git. Baixando código via clone..."
+          TMP_CLONE="/tmp/beserra-clone-$$"
+          git clone "$REPO_URL" "$TMP_CLONE"
+          # Remove código antigo EXCETO .wrangler (banco)
+          find "$APP_DIR" -mindepth 1 -maxdepth 1 \
+            ! -name '.wrangler' ! -name 'node_modules' \
+            -exec rm -rf {} + 2>/dev/null || true
+          # Copia novo código (exceto .git e .wrangler do clone)
+          cp -r "$TMP_CLONE"/. "$APP_DIR/" 2>/dev/null || true
+          rm -rf "$TMP_CLONE"
+          log "Código atualizado via clone (sem apagar banco)"
         fi
       else
-        # Sem repositório: apenas atualiza dependências e build
-        info "Sem repositório informado. Atualizando dependências e build..."
+        # Sem URL de repositório: apenas rebuild com código atual
+        info "Sem repositório informado. Rebuilding com código atual..."
         cd "$APP_DIR"
+      fi
 
-        # Salva banco
-        TMP_DB="/tmp/beserra-db-backup-$$"
-        if [ -d "$DB_DIR" ]; then
-          cp -r "$APP_DIR/.wrangler" "$TMP_DB"
-        fi
-
-        npm install --legacy-peer-deps
-        npm run build
-
-        # Restaura banco
-        if [ -d "$TMP_DB" ]; then
-          rm -rf "$APP_DIR/.wrangler"
-          cp -r "$TMP_DB" "$APP_DIR/.wrangler"
-          rm -rf "$TMP_DB"
-          log "Banco de dados restaurado após build"
-        fi
+      # Restaura o banco (sempre, independente do método de update)
+      if [ -d "$TMP_DB" ]; then
+        rm -rf "$APP_DIR/.wrangler"
+        cp -r "$TMP_DB" "$APP_DIR/.wrangler"
+        rm -rf "$TMP_DB"
+        log "Banco de dados restaurado após update"
       fi
       ;;
 
