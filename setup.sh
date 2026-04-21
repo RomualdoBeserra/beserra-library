@@ -277,6 +277,27 @@ if [ ! -d "$APP_DIR" ]; then
   fi
 fi
 
+# ── 5b. Configurar SWAP (evita Bus error / OOM em VMs com pouca RAM) ──
+section "Configurando memória swap"
+
+TOTAL_RAM_MB=$(awk '/MemTotal/ {printf "%d", $2/1024}' /proc/meminfo)
+info "RAM disponível: ${TOTAL_RAM_MB} MB"
+
+# Cria swap de 2GB se não existir ou for menor que 1GB
+SWAP_TOTAL=$(swapon --show=SIZE --noheadings --bytes 2>/dev/null | awk '{sum+=$1} END {printf "%d", sum/1024/1024}')
+if [ "${SWAP_TOTAL:-0}" -lt 1024 ]; then
+  info "Criando swap de 2GB..."
+  sudo fallocate -l 2G /swapfile 2>/dev/null || sudo dd if=/dev/zero of=/swapfile bs=1M count=2048 status=none
+  sudo chmod 600 /swapfile
+  sudo mkswap /swapfile -q
+  sudo swapon /swapfile
+  # Persiste no fstab se ainda não estiver
+  grep -q '/swapfile' /etc/fstab || echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab > /dev/null
+  log "Swap de 2GB ativado"
+else
+  log "Swap já configurado (${SWAP_TOTAL} MB) — OK"
+fi
+
 # ── 6. Instalar dependências e build ─────────────────────────
 section "6/8 — Instalando dependências e fazendo build"
 cd "$APP_DIR"
@@ -290,7 +311,8 @@ npm install --legacy-peer-deps
 log "Dependências instaladas"
 
 info "Fazendo build da aplicação..."
-npm run build
+# NODE_OPTIONS limita heap a 512MB para evitar Bus error em VMs com pouca RAM
+NODE_OPTIONS="--max-old-space-size=512" npm run build
 log "Build concluído — dist/ gerado"
 
 # ── 7. Configurar PM2 ────────────────────────────────────────
