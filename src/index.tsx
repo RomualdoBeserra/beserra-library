@@ -20,84 +20,129 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
   <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
-    body{font-family:'Inter',sans-serif}
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=IM+Fell+English:ital@0;1&family=Lato:wght@300;400;700&display=swap');
+    /* ── Dark Academia Base ── */
+    :root{
+      --da-bg:#120c05;
+      --da-bg2:#1a1209;
+      --da-bg3:#1f1508;
+      --da-border:#3a2509;
+      --da-border2:#5c3d1a;
+      --da-gold:#c9882a;
+      --da-gold2:#f0c060;
+      --da-gold3:#e0a040;
+      --da-text:#e8d5b0;
+      --da-text2:#c9a96e;
+      --da-text3:#7a6040;
+      --da-green:#5a9e5a;
+      --da-green-bg:#1a3a1a;
+      --da-amber:#c9882a;
+      --da-amber-bg:#3a1a00;
+    }
+    *{box-sizing:border-box}
+    body{font-family:'Lato',sans-serif;background:var(--da-bg2);color:var(--da-text);min-height:100vh}
     h1,h2,h3,.font-serif{font-family:'Playfair Display',serif}
-    .book-card{transition:transform .2s,box-shadow .2s}
-    .book-card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,0,0,.15)}
-    .status-badge{font-size:.7rem;font-weight:600;letter-spacing:.05em}
-    .modal-overlay{animation:fadeIn .2s ease}
+    /* Cards */
+    .book-card{background:var(--da-bg3);border:1px solid var(--da-border2);border-radius:4px;transition:transform .25s,box-shadow .25s,border-color .25s}
+    .book-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.6);border-color:var(--da-gold)}
+    .status-badge{font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+    /* Modal */
+    .modal-overlay{animation:fadeIn .2s ease;background:rgba(0,0,0,.75)}
     @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-    .modal-box{animation:slideUp .25s ease}
+    .modal-box{animation:slideUp .25s ease;background:var(--da-bg3);border:1px solid var(--da-border2);border-radius:4px;color:var(--da-text)}
     @keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
-    .sidebar-item.active{background:#ede9fe;color:#7c3aed;font-weight:600}
-    .loading-spinner{display:inline-block;width:20px;height:20px;border:3px solid rgba(124,58,237,.3);border-top-color:#7c3aed;border-radius:50%;animation:spin .8s linear infinite}
+    /* Sidebar */
+    .sidebar-item{color:var(--da-text2);border-left:3px solid transparent;border-radius:0 4px 4px 0;transition:all .2s}
+    .sidebar-item:hover{background:rgba(201,136,42,.1);color:var(--da-gold2);border-left-color:var(--da-border2)}
+    .sidebar-item.active{background:rgba(201,136,42,.18);color:var(--da-gold2);font-weight:600;border-left-color:var(--da-gold)}
+    /* Spinner */
+    .loading-spinner{display:inline-block;width:20px;height:20px;border:3px solid rgba(201,136,42,.25);border-top-color:var(--da-gold);border-radius:50%;animation:spin .8s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
-    input:focus,select:focus,textarea:focus{outline:none;border-color:#7c3aed;box-shadow:0 0 0 3px rgba(124,58,237,.15)}
-    ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#f3f4f6}::-webkit-scrollbar-thumb{background:#c4b5fd;border-radius:3px}
-    .cover-placeholder{background:linear-gradient(135deg,#7c3aed,#4f46e5)}
-    .toast{animation:slideInRight .3s ease,fadeOut .3s ease 2.7s forwards}
+    /* Inputs */
+    input,select,textarea{background:var(--da-bg);border:1px solid var(--da-border2);color:var(--da-text);border-radius:3px;font-family:'Lato',sans-serif}
+    input::placeholder,textarea::placeholder{color:var(--da-text3)}
+    input:focus,select:focus,textarea:focus{outline:none;border-color:var(--da-gold);box-shadow:0 0 0 3px rgba(201,136,42,.12)}
+    /* Scrollbar */
+    ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--da-bg)}::-webkit-scrollbar-thumb{background:var(--da-border2);border-radius:3px}
+    ::-webkit-scrollbar-thumb:hover{background:var(--da-gold)}
+    /* Cover placeholder */
+    .cover-placeholder{background:linear-gradient(160deg,#5c3d1a,#3a2509)}
+    /* Toast */
+    .toast{animation:slideInRight .3s ease,fadeOut .3s ease 2.7s forwards;background:var(--da-bg3);border:1px solid var(--da-gold);color:var(--da-text)}
     @keyframes slideInRight{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
     @keyframes fadeOut{to{opacity:0;transform:translateX(100%)}}
+    /* Steps (empréstimo) */
     .step-circle{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0}
-    .step-active .step-circle{background:#7c3aed;color:#fff}
-    .step-done .step-circle{background:#10b981;color:#fff}
-    .step-pending .step-circle{background:#e5e7eb;color:#9ca3af}
-    .step-line{flex:1;height:2px;background:#e5e7eb}
-    .step-line.done{background:#10b981}
-    .barcode-bar{display:inline-block;background:#111;height:56px}
+    .step-active .step-circle{background:var(--da-gold);color:var(--da-bg)}
+    .step-done .step-circle{background:var(--da-green);color:#fff}
+    .step-pending .step-circle{background:var(--da-border);color:var(--da-text3)}
+    .step-line{flex:1;height:2px;background:var(--da-border)}
+    .step-line.done{background:var(--da-green)}
+    .barcode-bar{display:inline-block;background:var(--da-text);height:56px}
     .boleto-box{font-family:'Courier New',monospace}
     @keyframes pulse2{0%,100%{opacity:1}50%{opacity:.5}}
     .animate-pulse2{animation:pulse2 1.5s ease-in-out infinite}
+    /* Ornamentos tipográficos */
+    .da-divider{border:none;border-top:1px solid var(--da-border2);margin:12px 0;position:relative}
+    .da-section-title{font-family:'Playfair Display',serif;color:var(--da-gold2);font-size:.65rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase}
+    /* Botões primários */
+    .btn-primary{background:var(--da-gold);color:var(--da-bg);font-weight:700;border:none;border-radius:3px;transition:background .2s,transform .1s}
+    .btn-primary:hover{background:var(--da-gold3);transform:translateY(-1px)}
+    /* Emp filter ativo */
+    .emp-filter-btn.active-filter{background:var(--da-gold)!important;color:var(--da-bg)!important}
+    /* Select options dark */
+    option{background:var(--da-bg);color:var(--da-text)}
+    /* Layout list mode */
+    .list-mode .book-card{border-radius:3px}
   </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body>
 
 <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
 
-<!-- HEADER -->
-<header class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+<!-- HEADER Dark Academia -->
+<header style="background:#0d0903;border-bottom:1px solid #3a2509;" class="sticky top-0 z-40">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-violet-600 rounded-xl flex items-center justify-center">
-          <i class="fas fa-book-open text-white text-lg"></i>
+        <div style="width:40px;height:40px;background:linear-gradient(135deg,#c9882a,#8b5e1a);border-radius:6px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(201,136,42,.3)">
+          <i class="fas fa-book text-yellow-100"></i>
         </div>
         <div>
-          <h1 class="font-serif text-xl font-bold text-gray-900">Beserra Library</h1>
-          <p class="text-xs text-gray-500">Biblioteca Familiar</p>
+          <h1 style="font-family:'Playfair Display',serif;font-size:1.15rem;color:#f0c060;font-weight:700;line-height:1.2;">Beserra Library</h1>
+          <p style="font-size:.6rem;color:#7a6040;letter-spacing:.12em;text-transform:uppercase;">Biblioteca Familiar</p>
         </div>
       </div>
       <div class="flex items-center gap-3">
         <div class="relative hidden sm:block">
-          <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-          <input id="search-global" type="text" placeholder="Buscar livros, autores..."
-            class="pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm w-64 bg-gray-50 transition-all duration-200 focus:bg-white focus:w-80"/>
+          <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-sm" style="color:#7a6040;"></i>
+          <input id="search-global" type="text" placeholder="Buscar obras, autores..."
+            style="padding-left:2rem;padding-right:1rem;padding-top:.5rem;padding-bottom:.5rem;background:#120c05;border:1px solid #5c3d1a;color:#e8d5b0;border-radius:3px;font-size:.85rem;width:220px;transition:width .2s"/>
         </div>
         <!-- Botão Novo Livro — só admin -->
-        <button id="btn-novo-livro" onclick="openModal('modal-livro')" class="hidden bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
-          <i class="fas fa-plus"></i><span class="hidden sm:inline">Novo Livro</span>
+        <button id="btn-novo-livro" onclick="openModal('modal-livro')" class="hidden btn-primary px-4 py-2 text-sm flex items-center gap-2">
+          <i class="fas fa-feather-alt text-xs"></i><span class="hidden sm:inline">Catalogar</span>
         </button>
         <!-- Estado não logado -->
-        <button id="btn-header-login" onclick="openModal('modal-login')" class="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors">
-          <i class="fas fa-user-lock"></i><span class="hidden sm:inline">Entrar</span>
+        <button id="btn-header-login" onclick="openModal('modal-login')" style="border:1px solid #5c3d1a;color:#c9a96e;padding:6px 16px;border-radius:3px;font-size:.85rem;transition:all .2s;background:transparent" class="flex items-center gap-2 hover:border-da-gold">
+          <i class="fas fa-user-lock text-xs"></i><span class="hidden sm:inline">Entrar</span>
         </button>
         <!-- Estado logado -->
         <div id="btn-header-user" class="hidden relative">
-          <button onclick="toggleUserMenu()" class="flex items-center gap-2 px-3 py-2 bg-violet-50 border border-violet-200 rounded-lg text-sm text-violet-700 hover:bg-violet-100 transition-colors">
-            <i class="fas fa-user-shield"></i>
+          <button onclick="toggleUserMenu()" style="background:rgba(201,136,42,.15);border:1px solid #5c3d1a;color:#f0c060;padding:6px 14px;border-radius:3px;font-size:.85rem;" class="flex items-center gap-2">
+            <i class="fas fa-user-shield text-xs"></i>
             <span id="header-user-nome" class="hidden sm:inline font-medium"></span>
             <i class="fas fa-chevron-down text-xs"></i>
           </button>
-          <div id="user-menu" class="hidden absolute right-0 top-12 bg-white border border-gray-200 rounded-xl shadow-lg w-52 z-50 overflow-hidden">
-            <div class="px-4 py-3 border-b border-gray-100 bg-gray-50">
-              <p class="text-xs text-gray-500">Logado como</p>
-              <p id="menu-user-email" class="text-sm font-semibold text-gray-800 truncate"></p>
+          <div id="user-menu" class="hidden absolute right-0 top-12 z-50 overflow-hidden" style="background:#1a1209;border:1px solid #5c3d1a;border-radius:4px;width:200px;box-shadow:0 8px 24px rgba(0,0,0,.6)">
+            <div style="padding:12px 16px;border-bottom:1px solid #3a2509;background:#120c05;">
+              <p style="font-size:.65rem;color:#7a6040;text-transform:uppercase;letter-spacing:.08em;">Logado como</p>
+              <p id="menu-user-email" style="font-size:.85rem;font-weight:600;color:#e8d5b0;" class="truncate"></p>
             </div>
             <ul class="p-1">
-              <li><button onclick="abrirTrocarSenha()" class="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"><i class="fas fa-key w-4 text-center text-gray-400"></i> Trocar senha</button></li>
-              <li><button onclick="setView('configuracoes')" class="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"><i class="fas fa-gear w-4 text-center text-gray-400"></i> Configurações</button></li>
-              <li class="border-t border-gray-100 mt-1 pt-1"><button onclick="fazerLogout()" class="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg"><i class="fas fa-sign-out-alt w-4 text-center"></i> Sair</button></li>
+              <li><button onclick="abrirTrocarSenha()" style="color:#c9a96e;font-size:.85rem;" class="w-full text-left flex items-center gap-2 px-3 py-2 hover:bg-amber-900/20"><i class="fas fa-key w-4 text-center" style="color:#7a6040;"></i> Trocar senha</button></li>
+              <li><button onclick="setView('configuracoes')" style="color:#c9a96e;font-size:.85rem;" class="w-full text-left flex items-center gap-2 px-3 py-2 hover:bg-amber-900/20"><i class="fas fa-gear w-4 text-center" style="color:#7a6040;"></i> Configurações</button></li>
+              <li style="border-top:1px solid #3a2509;margin-top:4px;padding-top:4px;"><button onclick="fazerLogout()" style="color:#c0614a;font-size:.85rem;" class="w-full text-left flex items-center gap-2 px-3 py-2 hover:bg-red-900/20"><i class="fas fa-sign-out-alt w-4 text-center"></i> Sair</button></li>
             </ul>
           </div>
         </div>
@@ -109,25 +154,27 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
   <div class="flex gap-6">
 
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR Dark Academia -->
     <aside class="w-56 flex-shrink-0 hidden lg:block">
-      <nav class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div class="p-4 border-b border-gray-100">
-          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Menu</p>
+      <nav style="background:#120c05;border:1px solid #3a2509;border-radius:4px;overflow:hidden;">
+        <div style="padding:14px 16px;border-bottom:1px solid #3a2509;">
+          <p class="da-section-title">Navegação</p>
         </div>
-        <ul class="p-2 space-y-1">
-          <li><button onclick="setView('livros')" id="nav-livros" class="sidebar-item active w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors"><i class="fas fa-books w-4 text-center"></i> Acervo de Livros</button></li>
-          <li class="hidden"><button onclick="setView('emprestimos')" id="nav-emprestimos" class="sidebar-item w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 hover:bg-gray-50"><i class="fas fa-handshake w-4 text-center"></i> Empréstimos <span id="badge-emp" class="ml-auto bg-amber-100 text-amber-700 text-xs px-1.5 py-0.5 rounded-full hidden"></span></button></li>
-          <li class="hidden"><button onclick="setView('autores')" id="nav-autores" class="sidebar-item w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 hover:bg-gray-50"><i class="fas fa-user-pen w-4 text-center"></i> Autores</button></li>
-          <li class="hidden"><button onclick="setView('categorias')" id="nav-categorias" class="sidebar-item w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 hover:bg-gray-50"><i class="fas fa-tags w-4 text-center"></i> Categorias</button></li>
-          <li class="hidden"><button onclick="setView('configuracoes')" id="nav-configuracoes" class="sidebar-item w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 hover:bg-gray-50"><i class="fas fa-gear w-4 text-center"></i> Configurações</button></li>
+        <ul style="padding:8px;display:flex;flex-direction:column;gap:2px;">
+          <li><button onclick="setView('livros')" id="nav-livros" class="sidebar-item active w-full text-left flex items-center gap-3 px-3 py-2.5 text-sm"><i class="fas fa-books w-4 text-center"></i> Acervo de Livros</button></li>
+          <li class="hidden"><button onclick="setView('emprestimos')" id="nav-emprestimos" class="sidebar-item w-full text-left flex items-center gap-3 px-3 py-2.5 text-sm"><i class="fas fa-handshake w-4 text-center"></i> Empréstimos <span id="badge-emp" style="margin-left:auto;background:#3a1a00;color:#c9882a;font-size:.65rem;padding:1px 6px;border-radius:999px;" class="hidden"></span></button></li>
+          <li class="hidden"><button onclick="setView('autores')" id="nav-autores" class="sidebar-item w-full text-left flex items-center gap-3 px-3 py-2.5 text-sm"><i class="fas fa-user-pen w-4 text-center"></i> Autores</button></li>
+          <li class="hidden"><button onclick="setView('categorias')" id="nav-categorias" class="sidebar-item w-full text-left flex items-center gap-3 px-3 py-2.5 text-sm"><i class="fas fa-tags w-4 text-center"></i> Categorias</button></li>
+          <li class="hidden"><button onclick="setView('configuracoes')" id="nav-configuracoes" class="sidebar-item w-full text-left flex items-center gap-3 px-3 py-2.5 text-sm"><i class="fas fa-gear w-4 text-center"></i> Configurações</button></li>
         </ul>
-        <div class="p-4 border-t border-gray-100 mt-2">
-          <div class="space-y-2 text-xs text-gray-500">
-            <p class="flex justify-between"><span>Total de livros</span><span id="stat-total" class="font-semibold text-gray-700">—</span></p>
-            <p class="flex justify-between"><span>Disponíveis</span><span id="stat-disp" class="font-semibold text-green-600">—</span></p>
-            <p class="flex justify-between"><span>Emprestados</span><span id="stat-emp" class="font-semibold text-amber-600">—</span></p>
+        <div style="padding:14px 16px;border-top:1px solid #3a2509;margin-top:4px;">
+          <div style="background:rgba(201,136,42,.08);border:1px solid #3a2509;border-radius:3px;padding:10px;margin-bottom:10px;text-align:center;">
+            <p class="da-section-title" style="margin-bottom:4px;">Acervo</p>
+            <p id="stat-total" style="font-family:'Playfair Display',serif;font-size:1.6rem;color:#f0c060;font-weight:700;line-height:1;">—</p>
+            <p style="font-size:.6rem;color:#7a6040;">obras catalogadas</p>
           </div>
+          <p class="flex justify-between text-xs" style="color:#7a6040;margin-bottom:5px;"><span>Disponíveis</span><span id="stat-disp" style="color:#5a9e5a;font-weight:700;">—</span></p>
+          <p class="flex justify-between text-xs" style="color:#7a6040;"><span>Emprestados</span><span id="stat-emp" style="color:#c9882a;font-weight:700;">—</span></p>
         </div>
       </nav>
     </aside>
@@ -137,20 +184,20 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
 
       <!-- LIVROS -->
       <div id="view-livros">
-        <div class="bg-white rounded-xl border border-gray-200 p-4 mb-5 flex flex-wrap gap-3 items-center">
-          <select id="filter-status" onchange="loadLivros()" class="border border-gray-200 rounded-lg text-sm px-3 py-2 bg-gray-50 text-gray-700">
+        <div style="background:#120c05;border:1px solid #3a2509;border-radius:4px;padding:12px 16px;margin-bottom:20px;" class="flex flex-wrap gap-3 items-center">
+          <select id="filter-status" onchange="loadLivros()" style="background:#1a1209;border:1px solid #5c3d1a;color:#c9a96e;border-radius:3px;font-size:.85rem;padding:6px 10px;">
             <option value="">Todos os status</option>
             <option value="disponivel">Disponível</option>
             <option value="emprestado">Emprestado</option>
             <option value="reservado">Reservado</option>
             <option value="indisponivel">Indisponível</option>
           </select>
-          <select id="filter-categoria" onchange="loadLivros()" class="border border-gray-200 rounded-lg text-sm px-3 py-2 bg-gray-50 text-gray-700">
+          <select id="filter-categoria" onchange="loadLivros()" style="background:#1a1209;border:1px solid #5c3d1a;color:#c9a96e;border-radius:3px;font-size:.85rem;padding:6px 10px;">
             <option value="">Todas as categorias</option>
           </select>
           <div class="ml-auto flex items-center gap-2">
-            <button onclick="setLayout('grid')" id="btn-grid" class="p-2 rounded-lg text-violet-600 bg-violet-50"><i class="fas fa-grip"></i></button>
-            <button onclick="setLayout('list')" id="btn-list" class="p-2 rounded-lg text-gray-400 hover:text-gray-600"><i class="fas fa-list"></i></button>
+            <button onclick="setLayout('grid')" id="btn-grid" style="padding:6px 10px;border-radius:3px;color:#c9882a;background:rgba(201,136,42,.15);border:1px solid #5c3d1a;"><i class="fas fa-grip"></i></button>
+            <button onclick="setLayout('list')" id="btn-list" style="padding:6px 10px;border-radius:3px;color:#7a6040;border:1px solid #3a2509;background:transparent;"><i class="fas fa-list"></i></button>
           </div>
         </div>
         <div id="livros-container" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
@@ -161,16 +208,16 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
       <!-- EMPRÉSTIMOS -->
       <div id="view-emprestimos" class="hidden">
         <div class="flex items-center justify-between mb-5">
-          <h2 class="font-serif text-2xl font-bold text-gray-800">Gestão de Empréstimos</h2>
+          <h2 class="font-serif text-2xl font-bold" style="color:#f0c060;">Gestão de Empréstimos</h2>
         </div>
         <!-- Filtros status empréstimo -->
-        <div class="bg-white rounded-xl border border-gray-200 p-4 mb-5 flex flex-wrap gap-2">
-          <button onclick="filterEmprestimos('')" id="ef-todos" class="emp-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-violet-600 text-white">Todos</button>
-          <button onclick="filterEmprestimos('aguardando_pagamento')" id="ef-aguardando" class="emp-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200">Aguardando Pagamento</button>
-          <button onclick="filterEmprestimos('pago')" id="ef-pago" class="emp-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200">Pago</button>
-          <button onclick="filterEmprestimos('enviado')" id="ef-enviado" class="emp-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200">Enviado</button>
-          <button onclick="filterEmprestimos('entregue')" id="ef-entregue" class="emp-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200">Entregue</button>
-          <button onclick="filterEmprestimos('cancelado')" id="ef-cancelado" class="emp-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200">Cancelado</button>
+        <div style="background:#120c05;border:1px solid #3a2509;border-radius:4px;padding:12px 16px;margin-bottom:20px;" class="flex flex-wrap gap-2">
+          <button onclick="filterEmprestimos('')" id="ef-todos" class="emp-filter-btn active-filter px-3 py-1.5 text-xs font-bold" style="border-radius:3px;">Todos</button>
+          <button onclick="filterEmprestimos('aguardando_pagamento')" id="ef-aguardando" class="emp-filter-btn px-3 py-1.5 text-xs font-semibold" style="border-radius:3px;background:#1a1209;border:1px solid #3a2509;color:#c9a96e;">Aguardando Pagamento</button>
+          <button onclick="filterEmprestimos('pago')" id="ef-pago" class="emp-filter-btn px-3 py-1.5 text-xs font-semibold" style="border-radius:3px;background:#1a1209;border:1px solid #3a2509;color:#c9a96e;">Pago</button>
+          <button onclick="filterEmprestimos('enviado')" id="ef-enviado" class="emp-filter-btn px-3 py-1.5 text-xs font-semibold" style="border-radius:3px;background:#1a1209;border:1px solid #3a2509;color:#c9a96e;">Enviado</button>
+          <button onclick="filterEmprestimos('entregue')" id="ef-entregue" class="emp-filter-btn px-3 py-1.5 text-xs font-semibold" style="border-radius:3px;background:#1a1209;border:1px solid #3a2509;color:#c9a96e;">Entregue</button>
+          <button onclick="filterEmprestimos('cancelado')" id="ef-cancelado" class="emp-filter-btn px-3 py-1.5 text-xs font-semibold" style="border-radius:3px;background:#1a1209;border:1px solid #3a2509;color:#c9a96e;">Cancelado</button>
         </div>
         <div id="emprestimos-container" class="space-y-4">
           <div class="flex items-center justify-center py-16 text-gray-400"><div class="loading-spinner"></div></div>
@@ -180,8 +227,8 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
       <!-- AUTORES -->
       <div id="view-autores" class="hidden">
         <div class="flex items-center justify-between mb-5">
-          <h2 class="font-serif text-2xl font-bold text-gray-800">Autores</h2>
-          <button onclick="openModal('modal-autor')" class="bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"><i class="fas fa-plus"></i> Novo Autor</button>
+          <h2 class="font-serif text-2xl font-bold" style="color:#f0c060;">Autores</h2>
+          <button onclick="openModal('modal-autor')" class="btn-primary px-4 py-2 text-sm flex items-center gap-2"><i class="fas fa-feather-alt text-xs"></i> Novo Autor</button>
         </div>
         <div id="autores-container" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
       </div>
@@ -189,8 +236,8 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
       <!-- CATEGORIAS -->
       <div id="view-categorias" class="hidden">
         <div class="flex items-center justify-between mb-5">
-          <h2 class="font-serif text-2xl font-bold text-gray-800">Categorias</h2>
-          <button onclick="openModal('modal-categoria')" class="bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"><i class="fas fa-plus"></i> Nova Categoria</button>
+          <h2 class="font-serif text-2xl font-bold" style="color:#f0c060;">Categorias</h2>
+          <button onclick="openModal('modal-categoria')" class="btn-primary px-4 py-2 text-sm flex items-center gap-2"><i class="fas fa-feather-alt text-xs"></i> Nova Categoria</button>
         </div>
         <div id="categorias-container" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
       </div>
@@ -198,96 +245,61 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
       <!-- CONFIGURAÇÕES -->
       <div id="view-configuracoes" class="hidden">
         <div class="mb-6">
-          <h2 class="font-serif text-2xl font-bold text-gray-800">Configurações do Administrador</h2>
-          <p class="text-sm text-gray-500 mt-1">Gerencie os dados da biblioteca e a chave PIX para recebimento de pagamentos</p>
+          <h2 class="font-serif text-2xl font-bold" style="color:#f0c060;">Configurações do Administrador</h2>
+          <p class="text-sm mt-1" style="color:#7a6040;">Gerencie os dados da biblioteca e a chave PIX para recebimento de pagamentos</p>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
           <!-- Card Perfil -->
-          <div class="bg-white rounded-2xl border border-gray-200 p-6">
+          <div style="background:#1a1209;border:1px solid #3a2509;border-radius:4px;padding:24px;">
             <div class="flex items-center gap-3 mb-5">
-              <div class="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
-                <i class="fas fa-building text-violet-600"></i>
+              <div style="width:40px;height:40px;background:rgba(201,136,42,.15);border:1px solid #5c3d1a;border-radius:4px;display:flex;align-items:center;justify-content:center;">
+                <i class="fas fa-building" style="color:#c9882a;"></i>
               </div>
               <div>
-                <h3 class="font-semibold text-gray-800">Dados da Biblioteca</h3>
-                <p class="text-xs text-gray-500">Informações exibidas nos comprovantes</p>
+                <h3 class="font-semibold" style="color:#e8d5b0;">Dados da Biblioteca</h3>
+                <p class="text-xs" style="color:#7a6040;">Informações exibidas nos comprovantes</p>
               </div>
             </div>
             <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Nome da Biblioteca</label>
-                <input id="cfg-nome" type="text" placeholder="Ex: Beserra Library" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition"/>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Responsável</label>
-                <input id="cfg-responsavel" type="text" placeholder="Nome do administrador" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition"/>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">E-mail de contato</label>
-                <input id="cfg-email" type="email" placeholder="contato@biblioteca.com" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition"/>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Telefone / WhatsApp</label>
-                <input id="cfg-telefone" type="text" placeholder="(11) 99999-9999" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition"/>
-              </div>
+              <div><label class="block text-sm font-medium mb-1" style="color:#c9a96e;">Nome da Biblioteca</label><input id="cfg-nome" type="text" placeholder="Ex: Beserra Library" class="w-full px-3 py-2 text-sm"/></div>
+              <div><label class="block text-sm font-medium mb-1" style="color:#c9a96e;">Responsável</label><input id="cfg-responsavel" type="text" placeholder="Nome do administrador" class="w-full px-3 py-2 text-sm"/></div>
+              <div><label class="block text-sm font-medium mb-1" style="color:#c9a96e;">E-mail de contato</label><input id="cfg-email" type="email" placeholder="contato@biblioteca.com" class="w-full px-3 py-2 text-sm"/></div>
+              <div><label class="block text-sm font-medium mb-1" style="color:#c9a96e;">Telefone / WhatsApp</label><input id="cfg-telefone" type="text" placeholder="(11) 99999-9999" class="w-full px-3 py-2 text-sm"/></div>
             </div>
           </div>
 
           <!-- Card PIX -->
-          <div class="bg-white rounded-2xl border border-gray-200 p-6">
+          <div style="background:#1a1209;border:1px solid #3a2509;border-radius:4px;padding:24px;">
             <div class="flex items-center gap-3 mb-5">
-              <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                <i class="fas fa-qrcode text-green-600"></i>
+              <div style="width:40px;height:40px;background:rgba(90,158,90,.12);border:1px solid #2d5a2d;border-radius:4px;display:flex;align-items:center;justify-content:center;">
+                <i class="fas fa-qrcode" style="color:#5a9e5a;"></i>
               </div>
               <div>
-                <h3 class="font-semibold text-gray-800">Chave PIX</h3>
-                <p class="text-xs text-gray-500">Usada para receber o pagamento do frete</p>
+                <h3 class="font-semibold" style="color:#e8d5b0;">Chave PIX</h3>
+                <p class="text-xs" style="color:#7a6040;">Usada para receber o pagamento do frete</p>
               </div>
             </div>
-
-            <!-- Preview PIX -->
-            <div id="pix-preview" class="hidden mb-5 bg-green-50 border border-green-200 rounded-xl p-4 text-center">
-              <div class="w-16 h-16 mx-auto mb-2 bg-white rounded-xl flex items-center justify-center shadow-sm border border-green-100">
-                <i class="fas fa-qrcode text-green-600 text-3xl"></i>
+            <div id="pix-preview" class="hidden mb-5 p-4 text-center" style="background:#0d1a0d;border:1px solid #2d5a2d;border-radius:3px;">
+              <div style="width:56px;height:56px;margin:0 auto 8px;background:#1a3a1a;border-radius:4px;display:flex;align-items:center;justify-content:center;border:1px solid #2d5a2d;">
+                <i class="fas fa-qrcode text-2xl" style="color:#5a9e5a;"></i>
               </div>
-              <p class="text-xs text-green-600 font-semibold mb-1">Chave PIX cadastrada</p>
-              <p id="pix-preview-tipo" class="text-xs text-gray-500 mb-1"></p>
-              <p id="pix-preview-chave" class="font-mono text-sm font-bold text-gray-800 break-all"></p>
-              <p id="pix-preview-nome" class="text-xs text-gray-500 mt-1"></p>
+              <p class="text-xs font-semibold mb-1" style="color:#5a9e5a;">Chave PIX cadastrada</p>
+              <p id="pix-preview-tipo" class="text-xs mb-1" style="color:#7a6040;"></p>
+              <p id="pix-preview-chave" class="font-mono text-sm font-bold break-all" style="color:#e8d5b0;"></p>
+              <p id="pix-preview-nome" class="text-xs mt-1" style="color:#7a6040;"></p>
             </div>
-
             <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Chave</label>
-                <select id="cfg-pix-tipo" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition" onchange="atualizarPlaceholderPix()">
-                  <option value="cpf">CPF</option>
-                  <option value="cnpj">CNPJ</option>
-                  <option value="email">E-mail</option>
-                  <option value="telefone">Telefone</option>
-                  <option value="aleatoria">Chave Aleatória</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Chave PIX <span class="text-red-500">*</span></label>
-                <input id="cfg-pix-chave" type="text" placeholder="000.000.000-00" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition font-mono"/>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Titular</label>
-                <input id="cfg-pix-titular" type="text" placeholder="Nome que aparece no PIX" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition"/>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Banco</label>
-                <input id="cfg-pix-banco" type="text" placeholder="Ex: Nubank, Itaú, Bradesco..." class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition"/>
-              </div>
+              <div><label class="block text-sm font-medium mb-1" style="color:#c9a96e;">Tipo de Chave</label><select id="cfg-pix-tipo" class="w-full px-3 py-2 text-sm" onchange="atualizarPlaceholderPix()"><option value="cpf">CPF</option><option value="cnpj">CNPJ</option><option value="email">E-mail</option><option value="telefone">Telefone</option><option value="aleatoria">Chave Aleatória</option></select></div>
+              <div><label class="block text-sm font-medium mb-1" style="color:#c9a96e;">Chave PIX <span style="color:#c0614a;">*</span></label><input id="cfg-pix-chave" type="text" placeholder="000.000.000-00" class="w-full px-3 py-2 text-sm font-mono"/></div>
+              <div><label class="block text-sm font-medium mb-1" style="color:#c9a96e;">Nome do Titular</label><input id="cfg-pix-titular" type="text" placeholder="Nome que aparece no PIX" class="w-full px-3 py-2 text-sm"/></div>
+              <div><label class="block text-sm font-medium mb-1" style="color:#c9a96e;">Banco</label><input id="cfg-pix-banco" type="text" placeholder="Ex: Nubank, Itaú, Bradesco..." class="w-full px-3 py-2 text-sm"/></div>
             </div>
           </div>
         </div>
-
-        <!-- Botão salvar -->
         <div class="mt-6 flex justify-end">
-          <button onclick="salvarConfiguracoes()" class="bg-violet-600 hover:bg-violet-700 text-white px-8 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition-colors shadow-sm">
-            <i class="fas fa-save"></i> Salvar Configurações
+          <button onclick="salvarConfiguracoes()" class="btn-primary px-8 py-2.5 text-sm font-semibold flex items-center gap-2">
+            <i class="fas fa-feather-alt"></i> Salvar Configurações
           </button>
         </div>
       </div>
@@ -299,107 +311,101 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
 <!-- ═══════════ MODAIS ═══════════ -->
 
 <!-- Modal Livro -->
-<div id="modal-livro" class="modal-overlay fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-  <div class="modal-box bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-    <div class="flex items-center justify-between p-6 border-b border-gray-100">
-      <h3 id="modal-livro-title" class="font-serif text-xl font-bold text-gray-800">Novo Livro</h3>
-      <button onclick="closeModal('modal-livro')" class="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100"><i class="fas fa-times"></i></button>
+<div id="modal-livro" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+  <div class="modal-box w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+    <div class="flex items-center justify-between p-6" style="border-bottom:1px solid #3a2509;">
+      <h3 id="modal-livro-title" class="font-serif text-xl font-bold" style="color:#f0c060;">Catalogar Livro</h3>
+      <button onclick="closeModal('modal-livro')" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:#7a6040;border:1px solid #3a2509;background:transparent;" class="hover:border-amber-700"><i class="fas fa-times text-xs"></i></button>
     </div>
     <form id="form-livro" onsubmit="saveLivro(event)" class="p-6 space-y-4">
       <input type="hidden" id="livro-id"/>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div class="sm:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Título <span class="text-red-500">*</span></label><input id="livro-titulo" type="text" required placeholder="Ex: Dom Casmurro" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"/></div>
-        <div><label class="block text-sm font-medium text-gray-700 mb-1">Autor</label><select id="livro-autor" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"><option value="">Selecionar autor</option></select></div>
-        <div><label class="block text-sm font-medium text-gray-700 mb-1">Categoria</label><select id="livro-categoria" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"><option value="">Selecionar categoria</option></select></div>
-        <div><label class="block text-sm font-medium text-gray-700 mb-1">ISBN</label><input id="livro-isbn" type="text" placeholder="978-xx-xxx-xxxx-x" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"/></div>
-        <div><label class="block text-sm font-medium text-gray-700 mb-1">Ano de Publicação</label><input id="livro-ano" type="number" min="1000" max="2030" placeholder="2024" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"/></div>
-        <div><label class="block text-sm font-medium text-gray-700 mb-1">Editora</label><input id="livro-editora" type="text" placeholder="Nome da editora" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"/></div>
-        <div><label class="block text-sm font-medium text-gray-700 mb-1">Nº de Páginas</label><input id="livro-paginas" type="number" min="1" placeholder="300" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"/></div>
-        <div><label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-          <select id="livro-status" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50">
-            <option value="disponivel">Disponível</option><option value="emprestado">Emprestado</option><option value="reservado">Reservado</option><option value="indisponivel">Indisponível</option>
-          </select>
-        </div>
-        <div class="sm:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">URL da Capa</label><input id="livro-capa" type="url" placeholder="https://..." class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"/></div>
-        <div class="sm:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Sinopse</label><textarea id="livro-sinopse" rows="3" placeholder="Descrição do livro..." class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 resize-none"></textarea></div>
+        <div class="sm:col-span-2"><label class="block text-sm font-medium mb-1" style="color:#c9a96e;">Título <span style="color:#c0614a;">*</span></label><input id="livro-titulo" type="text" required placeholder="Ex: Dom Casmurro" class="w-full px-3 py-2 text-sm"/></div>
+        <div><label class="block text-sm font-medium mb-1" style="color:#c9a96e;">Autor</label><select id="livro-autor" class="w-full px-3 py-2 text-sm"><option value="">Selecionar autor</option></select></div>
+        <div><label class="block text-sm font-medium mb-1" style="color:#c9a96e;">Categoria</label><select id="livro-categoria" class="w-full px-3 py-2 text-sm"><option value="">Selecionar categoria</option></select></div>
+        <div><label class="block text-sm font-medium mb-1" style="color:#c9a96e;">ISBN</label><input id="livro-isbn" type="text" placeholder="978-xx-xxx-xxxx-x" class="w-full px-3 py-2 text-sm"/></div>
+        <div><label class="block text-sm font-medium mb-1" style="color:#c9a96e;">Ano de Publicação</label><input id="livro-ano" type="number" min="1000" max="2030" placeholder="2024" class="w-full px-3 py-2 text-sm"/></div>
+        <div><label class="block text-sm font-medium mb-1" style="color:#c9a96e;">Editora</label><input id="livro-editora" type="text" placeholder="Nome da editora" class="w-full px-3 py-2 text-sm"/></div>
+        <div><label class="block text-sm font-medium mb-1" style="color:#c9a96e;">Nº de Páginas</label><input id="livro-paginas" type="number" min="1" placeholder="300" class="w-full px-3 py-2 text-sm"/></div>
+        <div><label class="block text-sm font-medium mb-1" style="color:#c9a96e;">Status</label><select id="livro-status" class="w-full px-3 py-2 text-sm"><option value="disponivel">Disponível</option><option value="emprestado">Emprestado</option><option value="reservado">Reservado</option><option value="indisponivel">Indisponível</option></select></div>
+        <div class="sm:col-span-2"><label class="block text-sm font-medium mb-1" style="color:#c9a96e;">URL da Capa</label><input id="livro-capa" type="url" placeholder="https://..." class="w-full px-3 py-2 text-sm"/></div>
+        <div class="sm:col-span-2"><label class="block text-sm font-medium mb-1" style="color:#c9a96e;">Sinopse</label><textarea id="livro-sinopse" rows="3" placeholder="Descrição do livro..." class="w-full px-3 py-2 text-sm resize-none"></textarea></div>
       </div>
       <div class="flex justify-end gap-3 pt-2">
-        <button type="button" onclick="closeModal('modal-livro')" class="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">Cancelar</button>
-        <button type="submit" class="px-6 py-2 text-sm bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-medium flex items-center gap-2"><i class="fas fa-save"></i><span id="btn-save-livro">Salvar Livro</span></button>
+        <button type="button" onclick="closeModal('modal-livro')" style="padding:8px 16px;font-size:.85rem;color:#7a6040;border:1px solid #3a2509;border-radius:3px;background:transparent;">Cancelar</button>
+        <button type="submit" class="btn-primary px-6 py-2 text-sm flex items-center gap-2"><i class="fas fa-feather-alt text-xs"></i><span id="btn-save-livro">Salvar Livro</span></button>
       </div>
     </form>
   </div>
 </div>
 
 <!-- Modal Autor -->
-<div id="modal-autor" class="modal-overlay fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-  <div class="modal-box bg-white rounded-2xl shadow-2xl w-full max-w-md">
-    <div class="flex items-center justify-between p-6 border-b border-gray-100">
-      <h3 id="modal-autor-title" class="font-serif text-xl font-bold text-gray-800">Novo Autor</h3>
-      <button onclick="closeModal('modal-autor')" class="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100"><i class="fas fa-times"></i></button>
+<div id="modal-autor" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+  <div class="modal-box w-full max-w-md shadow-2xl">
+    <div class="flex items-center justify-between p-6" style="border-bottom:1px solid #3a2509;">
+      <h3 id="modal-autor-title" class="font-serif text-xl font-bold" style="color:#f0c060;">Novo Autor</h3>
+      <button onclick="closeModal('modal-autor')" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:#7a6040;border:1px solid #3a2509;background:transparent;"><i class="fas fa-times text-xs"></i></button>
     </div>
     <form id="form-autor" onsubmit="saveAutor(event)" class="p-6 space-y-4">
       <input type="hidden" id="autor-id"/>
-      <div><label class="block text-sm font-medium text-gray-700 mb-1">Nome <span class="text-red-500">*</span></label><input id="autor-nome" type="text" required placeholder="Nome completo" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"/></div>
-      <div><label class="block text-sm font-medium text-gray-700 mb-1">Nacionalidade</label><input id="autor-nacionalidade" type="text" placeholder="Ex: Brasileiro" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"/></div>
+      <div><label class="block text-sm font-medium mb-1" style="color:#c9a96e;">Nome <span style="color:#c0614a;">*</span></label><input id="autor-nome" type="text" required placeholder="Nome completo" class="w-full px-3 py-2 text-sm"/></div>
+      <div><label class="block text-sm font-medium mb-1" style="color:#c9a96e;">Nacionalidade</label><input id="autor-nacionalidade" type="text" placeholder="Ex: Brasileiro" class="w-full px-3 py-2 text-sm"/></div>
       <div class="flex justify-end gap-3 pt-2">
-        <button type="button" onclick="closeModal('modal-autor')" class="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">Cancelar</button>
-        <button type="submit" class="px-6 py-2 text-sm bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-medium flex items-center gap-2"><i class="fas fa-save"></i> Salvar</button>
+        <button type="button" onclick="closeModal('modal-autor')" style="padding:8px 16px;font-size:.85rem;color:#7a6040;border:1px solid #3a2509;border-radius:3px;background:transparent;">Cancelar</button>
+        <button type="submit" class="btn-primary px-6 py-2 text-sm flex items-center gap-2"><i class="fas fa-feather-alt text-xs"></i> Salvar</button>
       </div>
     </form>
   </div>
 </div>
 
 <!-- Modal Categoria -->
-<div id="modal-categoria" class="modal-overlay fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-  <div class="modal-box bg-white rounded-2xl shadow-2xl w-full max-w-md">
-    <div class="flex items-center justify-between p-6 border-b border-gray-100">
-      <h3 id="modal-categoria-title" class="font-serif text-xl font-bold text-gray-800">Nova Categoria</h3>
-      <button onclick="closeModal('modal-categoria')" class="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100"><i class="fas fa-times"></i></button>
+<div id="modal-categoria" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+  <div class="modal-box w-full max-w-md shadow-2xl">
+    <div class="flex items-center justify-between p-6" style="border-bottom:1px solid #3a2509;">
+      <h3 id="modal-categoria-title" class="font-serif text-xl font-bold" style="color:#f0c060;">Nova Categoria</h3>
+      <button onclick="closeModal('modal-categoria')" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:#7a6040;border:1px solid #3a2509;background:transparent;"><i class="fas fa-times text-xs"></i></button>
     </div>
     <form id="form-categoria" onsubmit="saveCategoria(event)" class="p-6 space-y-4">
       <input type="hidden" id="categoria-id"/>
-      <div><label class="block text-sm font-medium text-gray-700 mb-1">Nome <span class="text-red-500">*</span></label><input id="categoria-nome" type="text" required placeholder="Ex: Romance" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"/></div>
-      <div><label class="block text-sm font-medium text-gray-700 mb-1">Descrição</label><textarea id="categoria-descricao" rows="2" placeholder="Breve descrição..." class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 resize-none"></textarea></div>
+      <div><label class="block text-sm font-medium mb-1" style="color:#c9a96e;">Nome <span style="color:#c0614a;">*</span></label><input id="categoria-nome" type="text" required placeholder="Ex: Romance" class="w-full px-3 py-2 text-sm"/></div>
+      <div><label class="block text-sm font-medium mb-1" style="color:#c9a96e;">Descrição</label><textarea id="categoria-descricao" rows="2" placeholder="Breve descrição..." class="w-full px-3 py-2 text-sm resize-none"></textarea></div>
       <div class="flex justify-end gap-3 pt-2">
-        <button type="button" onclick="closeModal('modal-categoria')" class="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">Cancelar</button>
-        <button type="submit" class="px-6 py-2 text-sm bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-medium flex items-center gap-2"><i class="fas fa-save"></i> Salvar</button>
+        <button type="button" onclick="closeModal('modal-categoria')" style="padding:8px 16px;font-size:.85rem;color:#7a6040;border:1px solid #3a2509;border-radius:3px;background:transparent;">Cancelar</button>
+        <button type="submit" class="btn-primary px-6 py-2 text-sm flex items-center gap-2"><i class="fas fa-feather-alt text-xs"></i> Salvar</button>
       </div>
     </form>
   </div>
 </div>
 
 <!-- Modal Login -->
-<div id="modal-login" class="modal-overlay fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-  <div class="modal-box bg-white rounded-2xl shadow-2xl w-full max-w-sm">
-    <div class="p-6 text-center border-b border-gray-100">
-      <div class="w-14 h-14 bg-violet-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
-        <i class="fas fa-user-shield text-violet-600 text-2xl"></i>
+<div id="modal-login" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+  <div class="modal-box w-full max-w-sm shadow-2xl">
+    <div class="p-6 text-center" style="border-bottom:1px solid #3a2509;">
+      <div style="width:56px;height:56px;background:linear-gradient(135deg,#c9882a,#8b5e1a);border-radius:6px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+        <i class="fas fa-user-shield text-yellow-100 text-2xl"></i>
       </div>
-      <h3 class="font-serif text-xl font-bold text-gray-800">Área Administrativa</h3>
-      <p class="text-sm text-gray-500 mt-1">Entre com suas credenciais de administrador</p>
+      <h3 class="font-serif text-xl font-bold" style="color:#f0c060;">Área Administrativa</h3>
+      <p class="text-sm mt-1" style="color:#7a6040;">Entre com suas credenciais de administrador</p>
     </div>
     <form id="form-login" onsubmit="fazerLogin(event)" class="p-6 space-y-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
-        <input id="login-email" type="email" required placeholder="admin@beserra.com" autocomplete="email"
-          class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition"/>
+        <label class="block text-sm font-medium mb-1" style="color:#c9a96e;">E-mail</label>
+        <input id="login-email" type="email" required placeholder="admin@beserra.com" autocomplete="email" class="w-full px-3 py-2.5 text-sm"/>
       </div>
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+        <label class="block text-sm font-medium mb-1" style="color:#c9a96e;">Senha</label>
         <div class="relative">
-          <input id="login-senha" type="password" required placeholder="••••••••" autocomplete="current-password"
-            class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition pr-10"/>
-          <button type="button" onclick="toggleSenhaVis('login-senha')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+          <input id="login-senha" type="password" required placeholder="••••••••" autocomplete="current-password" class="w-full px-3 py-2.5 text-sm pr-10"/>
+          <button type="button" onclick="toggleSenhaVis('login-senha')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#7a6040;background:none;border:none;cursor:pointer;">
             <i class="fas fa-eye text-sm"></i>
           </button>
         </div>
       </div>
-      <p id="login-erro" class="text-xs text-red-600 hidden"></p>
-      <button type="submit" id="btn-login-submit" class="w-full bg-violet-600 hover:bg-violet-700 text-white py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-colors">
+      <p id="login-erro" class="text-xs hidden" style="color:#c0614a;"></p>
+      <button type="submit" id="btn-login-submit" class="btn-primary w-full py-2.5 text-sm font-semibold flex items-center justify-center gap-2">
         <i class="fas fa-sign-in-alt"></i> Entrar
       </button>
-      <button type="button" onclick="closeModal('modal-login')" class="w-full text-sm text-gray-500 hover:text-gray-700 py-1">Cancelar</button>
+      <button type="button" onclick="closeModal('modal-login')" class="w-full text-sm py-1" style="color:#7a6040;background:none;border:none;cursor:pointer;">Cancelar</button>
     </form>
   </div>
 </div>
@@ -732,9 +738,14 @@ function fmtMoeda(v){return 'R$ '+parseFloat(v).toFixed(2).replace('.',',').repl
 function fmtData(d){if(!d)return'—';const dt=new Date(d);return dt.toLocaleDateString('pt-BR')+' '+dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
 
 function statusBadge(status){
-  const map={disponivel:['bg-green-100 text-green-700','Disponível'],emprestado:['bg-amber-100 text-amber-700','Emprestado'],reservado:['bg-blue-100 text-blue-700','Reservado'],indisponivel:['bg-red-100 text-red-700','Indisponível']};
-  const[cls,label]=map[status]||['bg-gray-100 text-gray-700',status];
-  return \`<span class="status-badge \${cls} px-2 py-0.5 rounded-full">\${label}</span>\`;
+  const map={
+    disponivel:['disponível','#5a9e5a','#1a3a1a'],
+    emprestado:['emprestado','#c9882a','#3a1a00'],
+    reservado:['reservado','#6a8fc9','#1a2a3a'],
+    indisponivel:['indisponível','#c04a3a','#3a1a1a']
+  };
+  const[label,color,bg]=map[status]||[status,'#7a6040','#1f1508'];
+  return \`<span class="status-badge" style="background:\${bg};color:\${color};border:1px solid \${color}40;padding:2px 8px;border-radius:2px;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;">\${label}</span>\`;
 }
 
 function empStatusBadge(s){
@@ -869,26 +880,26 @@ function coverPlaceholder(t,big=true){
 function renderLivros(livros){
   const c=document.getElementById('livros-container');
   if(!livros.length){
-    c.innerHTML=\`<div class="col-span-full flex flex-col items-center justify-center py-20 text-gray-400"><i class="fas fa-book-open text-5xl mb-4 opacity-30"></i><p class="text-lg font-medium">Nenhum livro encontrado</p><button onclick="openModal('modal-livro')" class="mt-4 px-4 py-2 bg-violet-600 text-white rounded-lg text-sm hover:bg-violet-700">+ Adicionar Livro</button></div>\`;
+    c.innerHTML=\`<div class="col-span-full flex flex-col items-center justify-center py-20" style="color:#7a6040"><i class="fas fa-book-open text-5xl mb-4" style="opacity:.3;color:#c9882a"></i><p class="text-lg font-serif" style="color:#c9a96e">Nenhuma obra encontrada</p><button onclick="openModal('modal-livro')" class="btn-primary mt-4 px-4 py-2 text-sm"><i class="fas fa-feather-alt mr-2 text-xs"></i>Catalogar obra</button></div>\`;
     return;
   }
   if(currentLayout==='grid'){
     c.className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5';
     c.innerHTML=livros.map(l=>\`
-      <article class="book-card bg-white rounded-xl border border-gray-200 overflow-hidden cursor-pointer" onclick="viewLivro(\${l.id})">
-        <div class="relative h-40 overflow-hidden">
+      <article class="book-card overflow-hidden cursor-pointer" onclick="viewLivro(\${l.id})">
+        <div class="relative h-44 overflow-hidden" style="border-bottom:1px solid #3a2509">
           \${l.capa_url?\`<img src="\${l.capa_url}" alt="\${l.titulo}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML=coverPlaceholder('\${l.titulo.replace(/'/g,'')}')">\`:coverPlaceholder(l.titulo)}
           <div class="absolute top-2 right-2">\${statusBadge(l.status)}</div>
         </div>
         <div class="p-4">
-          <h3 class="font-serif font-semibold text-gray-800 leading-snug line-clamp-2">\${l.titulo}</h3>
-          <p class="text-sm text-gray-500 mt-1">\${l.autor_nome||'Autor desconhecido'}</p>
-          \${l.categoria_nome?\`<span class="inline-block mt-2 text-xs bg-violet-50 text-violet-700 px-2 py-0.5 rounded-full">\${l.categoria_nome}</span>\`:''}
-          <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-            <span class="text-xs text-gray-400">\${l.ano_publicacao||''}\${l.editora?' · '+l.editora:''}</span>
+          <h3 class="font-serif font-semibold leading-snug line-clamp-2" style="color:#e8d5b0">\${l.titulo}</h3>
+          <p class="text-sm mt-1" style="color:#7a6040">\${l.autor_nome||'Autor desconhecido'}</p>
+          \${l.categoria_nome?\`<span class="inline-block mt-2 text-xs px-2 py-0.5" style="background:#3a2509;color:#c9882a;border-radius:2px;letter-spacing:.06em">\${l.categoria_nome}</span>\`:''}
+          <div class="flex items-center justify-between mt-3 pt-3" style="border-top:1px solid #3a2509">
+            <span class="text-xs" style="color:#5c3d1a">\${l.ano_publicacao||''}\${l.editora?' · '+l.editora:''}</span>
             <div class="flex gap-1">
-              \${l.status==='disponivel'?\`<button onclick="event.stopPropagation();solicitarEmprestimo(\${l.id})" title="Solicitar Empréstimo" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50"><i class="fas fa-handshake text-xs"></i></button>\`:''}
-              \${currentUser?\`<button onclick="event.stopPropagation();editLivro(\${l.id})" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-violet-600 hover:bg-violet-50"><i class="fas fa-edit text-xs"></i></button><button onclick="event.stopPropagation();deleteLivro(\${l.id},'\${l.titulo.replace(/'/g,'')}')" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50"><i class="fas fa-trash text-xs"></i></button>\`:''}
+              \${l.status==='disponivel'?\`<button onclick="event.stopPropagation();solicitarEmprestimo(\${l.id})" title="Solicitar Empréstimo" class="w-8 h-8 flex items-center justify-center" style="border-radius:3px;color:#7a6040;transition:all .2s" onmouseover="this.style.color='#5a9e5a';this.style.background='#1a3a1a'" onmouseout="this.style.color='#7a6040';this.style.background='transparent'"><i class="fas fa-handshake text-xs"></i></button>\`:''}
+              \${currentUser?\`<button onclick="event.stopPropagation();editLivro(\${l.id})" class="w-8 h-8 flex items-center justify-center" style="border-radius:3px;color:#7a6040;transition:all .2s" onmouseover="this.style.color='#c9882a';this.style.background='rgba(201,136,42,.1)'" onmouseout="this.style.color='#7a6040';this.style.background='transparent'"><i class="fas fa-edit text-xs"></i></button><button onclick="event.stopPropagation();deleteLivro(\${l.id},'\${l.titulo.replace(/'/g,'')}')" class="w-8 h-8 flex items-center justify-center" style="border-radius:3px;color:#7a6040;transition:all .2s" onmouseover="this.style.color='#c04a3a';this.style.background='rgba(192,74,58,.1)'" onmouseout="this.style.color='#7a6040';this.style.background='transparent'"><i class="fas fa-trash text-xs"></i></button>\`:''}
             </div>
           </div>
         </div>
@@ -896,14 +907,14 @@ function renderLivros(livros){
   }else{
     c.className='flex flex-col gap-2';
     c.innerHTML=livros.map(l=>\`
-      <article class="book-card bg-white rounded-xl border border-gray-200 flex items-center gap-4 p-4 cursor-pointer" onclick="viewLivro(\${l.id})">
-        <div class="w-12 h-16 rounded-lg overflow-hidden flex-shrink-0">\${l.capa_url?\`<img src="\${l.capa_url}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML=coverPlaceholder('\${l.titulo.replace(/'/g,'')}',false)">\`:coverPlaceholder(l.titulo,false)}</div>
-        <div class="flex-1 min-w-0"><h3 class="font-serif font-semibold text-gray-800 truncate">\${l.titulo}</h3><p class="text-sm text-gray-500">\${l.autor_nome||'Desconhecido'}\${l.ano_publicacao?' · '+l.ano_publicacao:''}</p></div>
-        \${l.categoria_nome?\`<span class="text-xs bg-violet-50 text-violet-700 px-2 py-0.5 rounded-full hidden sm:inline">\${l.categoria_nome}</span>\`:''}
+      <article class="book-card flex items-center gap-4 p-4 cursor-pointer" onclick="viewLivro(\${l.id})">
+        <div class="w-12 h-16 overflow-hidden flex-shrink-0" style="border-radius:3px;border:1px solid #3a2509">\${l.capa_url?\`<img src="\${l.capa_url}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML=coverPlaceholder('\${l.titulo.replace(/'/g,'')}',false)">\`:coverPlaceholder(l.titulo,false)}</div>
+        <div class="flex-1 min-w-0"><h3 class="font-serif font-semibold truncate" style="color:#e8d5b0">\${l.titulo}</h3><p class="text-sm" style="color:#7a6040">\${l.autor_nome||'Desconhecido'}\${l.ano_publicacao?' · '+l.ano_publicacao:''}</p></div>
+        \${l.categoria_nome?\`<span class="text-xs px-2 py-0.5 hidden sm:inline" style="background:#3a2509;color:#c9882a;border-radius:2px">\${l.categoria_nome}</span>\`:''}
         <div class="flex-shrink-0">\${statusBadge(l.status)}</div>
         <div class="flex gap-1 flex-shrink-0">
-          \${l.status==='disponivel'?\`<button onclick="event.stopPropagation();solicitarEmprestimo(\${l.id})" title="Solicitar Empréstimo" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50"><i class="fas fa-handshake text-xs"></i></button>\`:''}
-          \${currentUser?\`<button onclick="event.stopPropagation();editLivro(\${l.id})" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-violet-600 hover:bg-violet-50"><i class="fas fa-edit text-xs"></i></button><button onclick="event.stopPropagation();deleteLivro(\${l.id},'\${l.titulo.replace(/'/g,'')}')" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50"><i class="fas fa-trash text-xs"></i></button>\`:''}
+          \${l.status==='disponivel'?\`<button onclick="event.stopPropagation();solicitarEmprestimo(\${l.id})" title="Solicitar Empréstimo" class="w-8 h-8 flex items-center justify-center" style="border-radius:3px;color:#7a6040" onmouseover="this.style.color='#5a9e5a';this.style.background='#1a3a1a'" onmouseout="this.style.color='#7a6040';this.style.background='transparent'"><i class="fas fa-handshake text-xs"></i></button>\`:''}
+          \${currentUser?\`<button onclick="event.stopPropagation();editLivro(\${l.id})" class="w-8 h-8 flex items-center justify-center" style="border-radius:3px;color:#7a6040" onmouseover="this.style.color='#c9882a';this.style.background='rgba(201,136,42,.1)'" onmouseout="this.style.color='#7a6040';this.style.background='transparent'"><i class="fas fa-edit text-xs"></i></button><button onclick="event.stopPropagation();deleteLivro(\${l.id},'\${l.titulo.replace(/'/g,'')}')" class="w-8 h-8 flex items-center justify-center" style="border-radius:3px;color:#7a6040" onmouseover="this.style.color='#c04a3a';this.style.background='rgba(192,74,58,.1)'" onmouseout="this.style.color='#7a6040';this.style.background='transparent'"><i class="fas fa-trash text-xs"></i></button>\`:''}
         </div>
       </article>\`).join('');
   }
@@ -919,26 +930,26 @@ async function viewLivro(id){
   try{
     const{data:l}=await axios.get('/api/livros/'+id);
     document.getElementById('detalhe-content').innerHTML=\`
-      <div class="flex items-start justify-between mb-4"><div></div><button onclick="closeModal('modal-detalhe')" class="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100"><i class="fas fa-times"></i></button></div>
+      <div class="flex items-start justify-between mb-4"><div></div><button onclick="closeModal('modal-detalhe')" class="w-8 h-8 flex items-center justify-center" style="border-radius:50%;color:#7a6040;transition:all .2s" onmouseover="this.style.background='rgba(201,136,42,.1)'" onmouseout="this.style.background='transparent'"><i class="fas fa-times"></i></button></div>
       <div class="flex gap-5">
-        <div class="w-28 h-40 rounded-xl overflow-hidden flex-shrink-0 shadow-md">\${l.capa_url?\`<img src="\${l.capa_url}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML=coverPlaceholder('\${l.titulo.replace(/'/g,'')}')">\`:coverPlaceholder(l.titulo)}</div>
+        <div class="w-28 h-40 overflow-hidden flex-shrink-0" style="border-radius:3px;border:1px solid #3a2509;box-shadow:0 4px 16px rgba(0,0,0,.5)">\${l.capa_url?\`<img src="\${l.capa_url}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML=coverPlaceholder('\${l.titulo.replace(/'/g,'')}')">\`:coverPlaceholder(l.titulo)}</div>
         <div class="flex-1 min-w-0">
-          <h2 class="font-serif text-2xl font-bold text-gray-900 leading-snug">\${l.titulo}</h2>
-          <p class="text-gray-500 mt-1">\${l.autor_nome||'Autor desconhecido'}</p>
+          <h2 class="font-serif text-2xl font-bold leading-snug" style="color:#f0c060">\${l.titulo}</h2>
+          <p class="mt-1" style="color:#7a6040">\${l.autor_nome||'Autor desconhecido'}</p>
           <div class="mt-2">\${statusBadge(l.status)}</div>
-          \${l.categoria_nome?\`<p class="text-xs text-violet-600 bg-violet-50 rounded-full inline-block px-2 py-0.5 mt-2">\${l.categoria_nome}</p>\`:''}
+          \${l.categoria_nome?\`<p class="text-xs inline-block px-2 py-0.5 mt-2" style="color:#c9882a;background:#3a2509;border-radius:2px">\${l.categoria_nome}</p>\`:''}
         </div>
       </div>
       <div class="mt-5 grid grid-cols-2 gap-3 text-sm">
-        \${l.isbn?\`<div class="bg-gray-50 rounded-lg p-3"><p class="text-xs text-gray-400 mb-0.5">ISBN</p><p class="font-medium text-gray-700">\${l.isbn}</p></div>\`:''}
-        \${l.ano_publicacao?\`<div class="bg-gray-50 rounded-lg p-3"><p class="text-xs text-gray-400 mb-0.5">Ano</p><p class="font-medium text-gray-700">\${l.ano_publicacao}</p></div>\`:''}
-        \${l.editora?\`<div class="bg-gray-50 rounded-lg p-3"><p class="text-xs text-gray-400 mb-0.5">Editora</p><p class="font-medium text-gray-700">\${l.editora}</p></div>\`:''}
-        \${l.paginas?\`<div class="bg-gray-50 rounded-lg p-3"><p class="text-xs text-gray-400 mb-0.5">Páginas</p><p class="font-medium text-gray-700">\${l.paginas}</p></div>\`:''}
+        \${l.isbn?\`<div style="background:#120c05;border:1px solid #3a2509;border-radius:3px;padding:10px"><p class="da-section-title mb-0.5">ISBN</p><p class="font-medium" style="color:#c9a96e">\${l.isbn}</p></div>\`:''}
+        \${l.ano_publicacao?\`<div style="background:#120c05;border:1px solid #3a2509;border-radius:3px;padding:10px"><p class="da-section-title mb-0.5">Ano</p><p class="font-medium" style="color:#c9a96e">\${l.ano_publicacao}</p></div>\`:''}
+        \${l.editora?\`<div style="background:#120c05;border:1px solid #3a2509;border-radius:3px;padding:10px"><p class="da-section-title mb-0.5">Editora</p><p class="font-medium" style="color:#c9a96e">\${l.editora}</p></div>\`:''}
+        \${l.paginas?\`<div style="background:#120c05;border:1px solid #3a2509;border-radius:3px;padding:10px"><p class="da-section-title mb-0.5">Páginas</p><p class="font-medium" style="color:#c9a96e">\${l.paginas}</p></div>\`:''}
       </div>
-      \${l.sinopse?\`<div class="mt-4"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Sinopse</p><p class="text-sm text-gray-600 leading-relaxed">\${l.sinopse}</p></div>\`:''}
+      \${l.sinopse?\`<div class="mt-4"><p class="da-section-title mb-2">Sinopse</p><p class="text-sm leading-relaxed" style="color:#c9a96e">\${l.sinopse}</p></div>\`:''}
       <div class="mt-5 flex gap-3">
-        \${l.status==='disponivel'?\`<button onclick="closeModal('modal-detalhe');solicitarEmprestimo(\${l.id})" class="flex-1 bg-green-600 hover:bg-green-700 text-white rounded-lg py-2 text-sm font-medium"><i class="fas fa-handshake mr-2"></i>Solicitar Empréstimo</button>\`:\`<div class="flex-1 bg-gray-100 text-gray-400 rounded-lg py-2 text-sm font-medium text-center cursor-not-allowed">Livro indisponível</div>\`}
-        \${currentUser?\`<button onclick="closeModal('modal-detalhe');editLivro(\${l.id})" class="flex-1 border border-violet-200 text-violet-600 rounded-lg py-2 text-sm font-medium hover:bg-violet-50"><i class="fas fa-edit mr-2"></i>Editar</button><button onclick="closeModal('modal-detalhe');deleteLivro(\${l.id},'\${l.titulo.replace(/'/g,'')}')" class="border border-red-200 text-red-600 rounded-lg py-2 px-4 text-sm font-medium hover:bg-red-50"><i class="fas fa-trash"></i></button>\`:''}
+        \${l.status==='disponivel'?\`<button onclick="closeModal('modal-detalhe');solicitarEmprestimo(\${l.id})" class="flex-1 btn-primary py-2 text-sm font-medium" style="border-radius:3px"><i class="fas fa-handshake mr-2"></i>Solicitar Empréstimo</button>\`:\`<div class="flex-1 py-2 text-sm font-medium text-center" style="background:#1f1508;border:1px solid #3a2509;border-radius:3px;color:#5c3d1a;cursor:not-allowed">Obra indisponível</div>\`}
+        \${currentUser?\`<button onclick="closeModal('modal-detalhe');editLivro(\${l.id})" class="flex-1 py-2 text-sm font-medium" style="border:1px solid #5c3d1a;color:#c9a96e;border-radius:3px;transition:all .2s" onmouseover="this.style.background='rgba(201,136,42,.08)'" onmouseout="this.style.background='transparent'"><i class="fas fa-edit mr-2"></i>Editar</button><button onclick="closeModal('modal-detalhe');deleteLivro(\${l.id},'\${l.titulo.replace(/'/g,'')}')" class="py-2 px-4 text-sm font-medium" style="border:1px solid #5c3d1a;color:#c04a3a;border-radius:3px;transition:all .2s" onmouseover="this.style.background='rgba(192,74,58,.1)'" onmouseout="this.style.background='transparent'"><i class="fas fa-trash"></i></button>\`:''}
       </div>\`;
     openModal('modal-detalhe');
   }catch(e){showToast('Erro ao carregar detalhes','error')}
@@ -1002,9 +1013,9 @@ async function solicitarEmprestimo(livroId){
     document.getElementById('emp-livro-info').innerHTML=\`
       <div class="w-14 h-20 rounded-lg overflow-hidden flex-shrink-0 shadow">\${l.capa_url?\`<img src="\${l.capa_url}" class="w-full h-full object-cover" onerror="this.outerHTML=coverPlaceholder('\${l.titulo.replace(/'/g,'')}',false)">\`:coverPlaceholder(l.titulo,false)}</div>
       <div class="flex-1 min-w-0">
-        <p class="text-xs text-violet-600 font-semibold mb-1">Livro selecionado</p>
-        <h4 class="font-serif font-bold text-gray-900 leading-snug">\${l.titulo}</h4>
-        <p class="text-sm text-gray-500">\${l.autor_nome||'Autor desconhecido'}</p>
+        <p class="da-section-title mb-1">Livro selecionado</p>
+        <h4 class="font-serif font-bold leading-snug" style="color:#f0c060">\${l.titulo}</h4>
+        <p class="text-sm" style="color:#7a6040">\${l.autor_nome||'Autor desconhecido'}</p>
       </div>\`;
   }catch(e){}
 
