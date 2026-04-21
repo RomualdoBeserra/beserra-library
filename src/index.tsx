@@ -65,7 +65,7 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
         </div>
         <div>
           <h1 class="font-serif text-xl font-bold text-gray-900">Beserra Library</h1>
-          <p class="text-xs text-gray-500">Book Collection Management</p>
+          <p class="text-xs text-gray-500">Biblioteca Familiar</p>
         </div>
       </div>
       <div class="flex items-center gap-3">
@@ -117,10 +117,10 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
         </div>
         <ul class="p-2 space-y-1">
           <li><button onclick="setView('livros')" id="nav-livros" class="sidebar-item active w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors"><i class="fas fa-books w-4 text-center"></i> Acervo de Livros</button></li>
-          <li><button onclick="setView('emprestimos')" id="nav-emprestimos" class="sidebar-item w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 hover:bg-gray-50"><i class="fas fa-handshake w-4 text-center"></i> Empréstimos <span id="badge-emp" class="ml-auto bg-amber-100 text-amber-700 text-xs px-1.5 py-0.5 rounded-full hidden"></span></button></li>
-          <li><button onclick="setView('autores')" id="nav-autores" class="sidebar-item w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 hover:bg-gray-50"><i class="fas fa-user-pen w-4 text-center"></i> Autores</button></li>
-          <li><button onclick="setView('categorias')" id="nav-categorias" class="sidebar-item w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 hover:bg-gray-50"><i class="fas fa-tags w-4 text-center"></i> Categorias</button></li>
-          <li><button onclick="setView('configuracoes')" id="nav-configuracoes" class="sidebar-item w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 hover:bg-gray-50"><i class="fas fa-gear w-4 text-center"></i> Configurações</button></li>
+          <li class="hidden"><button onclick="setView('emprestimos')" id="nav-emprestimos" class="sidebar-item w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 hover:bg-gray-50"><i class="fas fa-handshake w-4 text-center"></i> Empréstimos <span id="badge-emp" class="ml-auto bg-amber-100 text-amber-700 text-xs px-1.5 py-0.5 rounded-full hidden"></span></button></li>
+          <li class="hidden"><button onclick="setView('autores')" id="nav-autores" class="sidebar-item w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 hover:bg-gray-50"><i class="fas fa-user-pen w-4 text-center"></i> Autores</button></li>
+          <li class="hidden"><button onclick="setView('categorias')" id="nav-categorias" class="sidebar-item w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 hover:bg-gray-50"><i class="fas fa-tags w-4 text-center"></i> Categorias</button></li>
+          <li class="hidden"><button onclick="setView('configuracoes')" id="nav-configuracoes" class="sidebar-item w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-gray-600 hover:bg-gray-50"><i class="fas fa-gear w-4 text-center"></i> Configurações</button></li>
         </ul>
         <div class="p-4 border-t border-gray-100 mt-2">
           <div class="space-y-2 text-xs text-gray-500">
