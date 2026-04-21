@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Templates — Beserra Library</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Lato:wght@300;400;700&family=Merriweather:wght@300;400;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+    body { font-family: 'Inter', sans-serif; background: #0f172a; }
+
+    /* ── Seletor de template ── */
+    .tab-btn { transition: all .2s; }
+    .tab-btn.active { background: #6d28d9; color: white; }
+
+    /* ══════════════════════════════════════════
+       TEMPLATE 1 — ATUAL (Violet Clean)
+    ══════════════════════════════════════════ */
+    #t1 { font-family: 'Inter', sans-serif; }
+    #t1 .book-card { transition: transform .2s, box-shadow .2s; }
+    #t1 .book-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,.15); }
+    #t1 .sidebar-item.active { background: #ede9fe; color: #7c3aed; font-weight: 600; }
+    #t1 .cover1 { background: linear-gradient(135deg, #7c3aed, #4f46e5); }
+    #t1 .cover2 { background: linear-gradient(135deg, #059669, #0d9488); }
+    #t1 .cover3 { background: linear-gradient(135deg, #dc2626, #db2777); }
+
+    /* ══════════════════════════════════════════
+       TEMPLATE 2 — Dark Academia
+    ══════════════════════════════════════════ */
+    #t2 { font-family: 'Merriweather', serif; background: #1a1209; color: #e8d5b0; }
+    #t2 .da-header { background: #0d0903; border-bottom: 1px solid #5c3d1a; }
+    #t2 .da-sidebar { background: #120c05; border-right: 1px solid #5c3d1a; }
+    #t2 .da-card { background: #1f1508; border: 1px solid #5c3d1a; transition: all .25s; }
+    #t2 .da-card:hover { border-color: #c9882a; transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.5); }
+    #t2 .da-nav-item { color: #c9a96e; transition: all .2s; }
+    #t2 .da-nav-item:hover, #t2 .da-nav-item.active { color: #f0c060; background: rgba(201,136,42,.15); border-left: 3px solid #c9882a; }
+    #t2 .da-badge-disp { background: #1a3a1a; color: #5a9e5a; border: 1px solid #2d5a2d; }
+    #t2 .da-badge-emp  { background: #3a1a00; color: #c9882a; border: 1px solid #5c3400; }
+    #t2 .da-cover1 { background: linear-gradient(160deg, #5c3d1a, #3a2509); }
+    #t2 .da-cover2 { background: linear-gradient(160deg, #1a3a1a, #0d2010); }
+    #t2 .da-cover3 { background: linear-gradient(160deg, #3a1a2a, #210d16); }
+    #t2 .da-btn { background: #c9882a; color: #0d0903; font-weight: 700; }
+    #t2 .da-btn:hover { background: #e0a040; }
+    #t2 .da-search { background: #120c05; border: 1px solid #5c3d1a; color: #e8d5b0; }
+    #t2 .da-search::placeholder { color: #7a6040; }
+    #t2 .da-stat { border-left: 3px solid #5c3d1a; }
+    #t2 h1 { font-family: 'Playfair Display', serif; }
+
+    /* ══════════════════════════════════════════
+       TEMPLATE 3 — Moderno Escuro (Midnight)
+    ══════════════════════════════════════════ */
+    #t3 { font-family: 'Poppins', sans-serif; background: #0f1117; color: #e2e8f0; }
+    #t3 .md-header { background: rgba(15,17,23,.95); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,.08); }
+    #t3 .md-sidebar { background: #161b27; border-right: 1px solid rgba(255,255,255,.06); }
+    #t3 .md-card { background: #161b27; border: 1px solid rgba(255,255,255,.06); transition: all .25s; }
+    #t3 .md-card:hover { border-color: #818cf8; box-shadow: 0 0 20px rgba(129,140,248,.15); transform: translateY(-3px); }
+    #t3 .md-nav-active { background: rgba(99,102,241,.2); color: #818cf8; border-left: 3px solid #6366f1; }
+    #t3 .md-nav-item { color: #94a3b8; transition: all .2s; border-left: 3px solid transparent; }
+    #t3 .md-nav-item:hover { color: #e2e8f0; background: rgba(255,255,255,.05); }
+    #t3 .md-badge-disp { background: rgba(16,185,129,.15); color: #34d399; border: 1px solid rgba(52,211,153,.2); }
+    #t3 .md-badge-emp  { background: rgba(245,158,11,.15); color: #fbbf24; border: 1px solid rgba(251,191,36,.2); }
+    #t3 .md-cover1 { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+    #t3 .md-cover2 { background: linear-gradient(135deg, #06b6d4, #3b82f6); }
+    #t3 .md-cover3 { background: linear-gradient(135deg, #f43f5e, #ec4899); }
+    #t3 .md-btn { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; }
+    #t3 .md-search { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); color: #e2e8f0; }
+    #t3 .md-search::placeholder { color: #475569; }
+    #t3 .md-glow { box-shadow: 0 0 40px rgba(99,102,241,.3); }
+
+    /* ══════════════════════════════════════════
+       TEMPLATE 4 — Natureza / Biblioteca Verde
+    ══════════════════════════════════════════ */
+    #t4 { font-family: 'Lato', sans-serif; background: #f0f7f0; color: #1a2e1a; }
+    #t4 .gr-header { background: #1a3a1a; color: white; }
+    #t4 .gr-sidebar { background: white; border: 1px solid #c8e6c9; border-radius: 16px; }
+    #t4 .gr-card { background: white; border: 1px solid #c8e6c9; transition: all .25s; border-radius: 12px; }
+    #t4 .gr-card:hover { border-color: #2e7d32; box-shadow: 0 8px 24px rgba(46,125,50,.12); transform: translateY(-3px); }
+    #t4 .gr-nav-active { background: #e8f5e9; color: #2e7d32; font-weight: 700; border-left: 4px solid #2e7d32; }
+    #t4 .gr-nav-item { color: #4a6741; transition: all .2s; border-left: 4px solid transparent; }
+    #t4 .gr-nav-item:hover { background: #f1f8f1; color: #2e7d32; }
+    #t4 .gr-badge-disp { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+    #t4 .gr-badge-emp  { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
+    #t4 .gr-cover1 { background: linear-gradient(135deg, #2e7d32, #1b5e20); }
+    #t4 .gr-cover2 { background: linear-gradient(135deg, #558b2f, #33691e); }
+    #t4 .gr-cover3 { background: linear-gradient(135deg, #0277bd, #01579b); }
+    #t4 .gr-btn { background: #2e7d32; color: white; }
+    #t4 .gr-btn:hover { background: #1b5e20; }
+    #t4 .gr-search { background: rgba(255,255,255,.9); border: 1px solid #a5d6a7; color: #1a2e1a; }
+    #t4 .gr-search::placeholder { color: #7a9e7a; }
+    #t4 .gr-stat { background: #e8f5e9; border-radius: 10px; }
+
+    /* ══════════════════════════════════════════
+       TEMPLATE 5 — Claro Minimalista (Cream)
+    ══════════════════════════════════════════ */
+    #t5 { font-family: 'Poppins', sans-serif; background: #faf7f2; color: #2c2416; }
+    #t5 .cr-header { background: #2c2416; color: #faf7f2; }
+    #t5 .cr-sidebar { background: #faf7f2; border: 1px solid #e8dfc8; }
+    #t5 .cr-card { background: white; border: 1px solid #e8dfc8; transition: all .25s; border-radius: 8px; }
+    #t5 .cr-card:hover { box-shadow: 0 6px 20px rgba(44,36,22,.1); transform: translateY(-3px); }
+    #t5 .cr-nav-active { background: #2c2416; color: #faf7f2; font-weight: 600; border-radius: 8px; }
+    #t5 .cr-nav-item { color: #7a6a52; transition: all .2s; border-radius: 8px; }
+    #t5 .cr-nav-item:hover { background: #f0e8d8; color: #2c2416; }
+    #t5 .cr-badge-disp { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+    #t5 .cr-badge-emp  { background: #fefce8; color: #854d0e; border: 1px solid #fde68a; }
+    #t5 .cr-cover1 { background: linear-gradient(135deg, #92400e, #78350f); }
+    #t5 .cr-cover2 { background: linear-gradient(135deg, #1e3a5f, #0c2340); }
+    #t5 .cr-cover3 { background: linear-gradient(135deg, #713f12, #451a03); }
+    #t5 .cr-btn { background: #2c2416; color: #faf7f2; }
+    #t5 .cr-btn:hover { background: #44362a; }
+    #t5 .cr-search { background: white; border: 1px solid #e8dfc8; color: #2c2416; }
+    #t5 .cr-search::placeholder { color: #b5a08a; }
+    #t5 .cr-accent { color: #92400e; }
+
+    /* Shared */
+    .template-section { display: none; }
+    .template-section.active { display: block; }
+    .preview-frame { border-radius: 12px; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,.5); }
+    .badge-new { background: linear-gradient(135deg,#f59e0b,#ef4444); }
+  </style>
+</head>
+<body>
+
+<!-- ── TOPO ── -->
+<div class="sticky top-0 z-50 bg-gray-950 border-b border-gray-800 px-6 py-4">
+  <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-white font-bold text-xl">🎨 Templates — Beserra Library</h1>
+      <p class="text-gray-400 text-sm">Escolha o visual ideal para sua biblioteca</p>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <button onclick="showTemplate(1)" id="tabBtn1" class="tab-btn active px-3 py-1.5 rounded-lg text-sm font-medium border border-gray-700 text-gray-300 hover:text-white">
+        1 · Atual
+      </button>
+      <button onclick="showTemplate(2)" id="tabBtn2" class="tab-btn px-3 py-1.5 rounded-lg text-sm font-medium border border-gray-700 text-gray-300 hover:text-white">
+        2 · Dark Academia
+      </button>
+      <button onclick="showTemplate(3)" id="tabBtn3" class="tab-btn px-3 py-1.5 rounded-lg text-sm font-medium border border-gray-700 text-gray-300 hover:text-white">
+        3 · Midnight
+      </button>
+      <button onclick="showTemplate(4)" id="tabBtn4" class="tab-btn px-3 py-1.5 rounded-lg text-sm font-medium border border-gray-700 text-gray-300 hover:text-white">
+        4 · Verde Natureza
+      </button>
+      <button onclick="showTemplate(5)" id="tabBtn5" class="tab-btn px-3 py-1.5 rounded-lg text-sm font-medium border border-gray-700 text-gray-300 hover:text-white">
+        5 · Cream Minimalista
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+
+<!-- ════════════════════════════════════════════════
+     TEMPLATE 1 — ATUAL (Violet Clean)
+════════════════════════════════════════════════ -->
+<div id="template1" class="template-section active">
+  <div class="mb-4 flex items-center justify-between">
+    <div>
+      <span class="inline-flex items-center gap-2 bg-violet-900/40 text-violet-300 text-xs font-semibold px-3 py-1 rounded-full border border-violet-700/50">
+        <i class="fas fa-check-circle"></i> TEMPLATE ATUAL
+      </span>
+      <h2 class="text-white text-2xl font-bold mt-2">Violet Clean</h2>
+      <p class="text-gray-400 text-sm">Limpo, moderno, fundo branco com acentos violeta. Fácil de usar.</p>
+    </div>
+  </div>
+  <div class="preview-frame" id="t1">
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 px-6" style="height:64px;display:flex;align-items:center;justify-content:space-between;">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-violet-600 rounded-xl flex items-center justify-center">
+          <i class="fas fa-book-open text-white"></i>
+        </div>
+        <div>
+          <div class="font-bold text-gray-900" style="font-family:'Playfair Display',serif;font-size:1rem;">Beserra Library</div>
+          <div class="text-gray-400" style="font-size:.7rem;">Biblioteca Familiar</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-1.5 bg-gray-50">
+          <i class="fas fa-search text-gray-400 text-xs"></i>
+          <span class="text-gray-400 text-xs">Buscar livros, autores...</span>
+        </div>
+        <button class="bg-violet-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1">
+          <i class="fas fa-plus text-xs"></i> Novo Livro
+        </button>
+        <button class="border border-gray-200 text-gray-600 px-3 py-1.5 rounded-lg text-xs flex items-center gap-1">
+          <i class="fas fa-user-lock text-xs"></i> Entrar
+        </button>
+      </div>
+    </header>
+    <!-- Body -->
+    <div class="flex" style="background:#f9fafb;min-height:460px;">
+      <!-- Sidebar -->
+      <aside style="width:200px;flex-shrink:0;padding:16px;">
+        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div class="px-4 py-3 border-b border-gray-100">
+            <p class="text-gray-400 font-semibold" style="font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;">Menu</p>
+          </div>
+          <ul class="p-2 space-y-1">
+            <li><button class="sidebar-item active w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg text-xs"><i class="fas fa-books w-4 text-center"></i> Acervo de Livros</button></li>
+            <li><button class="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-gray-500"><i class="fas fa-handshake w-4 text-center"></i> Empréstimos</button></li>
+            <li><button class="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-gray-500"><i class="fas fa-user-pen w-4 text-center"></i> Autores</button></li>
+            <li><button class="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-gray-500"><i class="fas fa-tags w-4 text-center"></i> Categorias</button></li>
+          </ul>
+          <div class="p-3 border-t border-gray-100">
+            <p class="flex justify-between text-xs text-gray-500 mb-1"><span>Total</span><span class="font-semibold text-gray-700">24</span></p>
+            <p class="flex justify-between text-xs text-gray-500 mb-1"><span>Disponíveis</span><span class="font-semibold text-green-600">18</span></p>
+            <p class="flex justify-between text-xs text-gray-500"><span>Emprestados</span><span class="font-semibold text-amber-600">6</span></p>
+          </div>
+        </div>
+      </aside>
+      <!-- Main -->
+      <main class="flex-1 p-4">
+        <div class="flex gap-2 mb-4 flex-wrap">
+          <select class="border border-gray-200 rounded-lg text-xs px-2 py-1.5 bg-white text-gray-700"><option>Todos os status</option></select>
+          <select class="border border-gray-200 rounded-lg text-xs px-2 py-1.5 bg-white text-gray-700"><option>Todas as categorias</option></select>
+        </div>
+        <div class="grid grid-cols-3 gap-4">
+          <!-- Card 1 -->
+          <div class="book-card bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div class="cover1 h-28 flex items-center justify-center">
+              <span style="font-family:'Playfair Display',serif;font-size:2.5rem;color:rgba(255,255,255,.6);font-weight:700;">D</span>
+            </div>
+            <div class="p-3">
+              <span class="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 font-semibold">Disponível</span>
+              <p class="font-semibold text-gray-900 text-xs mt-2 leading-tight">Dom Casmurro</p>
+              <p class="text-gray-400 text-xs mt-0.5">Machado de Assis</p>
+            </div>
+          </div>
+          <!-- Card 2 -->
+          <div class="book-card bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div class="cover2 h-28 flex items-center justify-center">
+              <span style="font-family:'Playfair Display',serif;font-size:2.5rem;color:rgba(255,255,255,.6);font-weight:700;">S</span>
+            </div>
+            <div class="p-3">
+              <span class="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-semibold">Emprestado</span>
+              <p class="font-semibold text-gray-900 text-xs mt-2 leading-tight">Senhor dos Anéis</p>
+              <p class="text-gray-400 text-xs mt-0.5">J.R.R. Tolkien</p>
+            </div>
+          </div>
+          <!-- Card 3 -->
+          <div class="book-card bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div class="cover3 h-28 flex items-center justify-center">
+              <span style="font-family:'Playfair Display',serif;font-size:2.5rem;color:rgba(255,255,255,.6);font-weight:700;">1</span>
+            </div>
+            <div class="p-3">
+              <span class="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 font-semibold">Disponível</span>
+              <p class="font-semibold text-gray-900 text-xs mt-2 leading-tight">1984</p>
+              <p class="text-gray-400 text-xs mt-0.5">George Orwell</p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     TEMPLATE 2 — Dark Academia
+════════════════════════════════════════════════ -->
+<div id="template2" class="template-section">
+  <div class="mb-4 flex items-center justify-between">
+    <div>
+      <span class="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1 rounded-full border badge-new text-white">
+        ✨ NOVO
+      </span>
+      <h2 class="text-white text-2xl font-bold mt-2">Dark Academia</h2>
+      <p class="text-gray-400 text-sm">Inspirado em bibliotecas antigas. Tom sépia, madeira e velas. Elegante e literário.</p>
+    </div>
+  </div>
+  <div class="preview-frame" id="t2">
+    <!-- Header -->
+    <header class="da-header px-6 flex items-center justify-between" style="height:64px;">
+      <div class="flex items-center gap-3">
+        <div style="width:36px;height:36px;background:linear-gradient(135deg,#c9882a,#8b5e1a);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+          <i class="fas fa-book text-yellow-100 text-sm"></i>
+        </div>
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#f0c060;font-weight:700;">Beserra Library</div>
+          <div style="font-size:.65rem;color:#7a6040;letter-spacing:.05em;">BIBLIOTECA FAMILIAR</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="da-search flex items-center gap-2 rounded px-3 py-1.5">
+          <i class="fas fa-search text-xs" style="color:#7a6040;"></i>
+          <span style="font-size:.7rem;color:#7a6040;">Buscar obras...</span>
+        </div>
+        <button class="da-btn px-3 py-1.5 rounded text-xs font-bold flex items-center gap-1">
+          <i class="fas fa-plus text-xs"></i> Catalogar
+        </button>
+        <button style="border:1px solid #5c3d1a;color:#c9a96e;padding:6px 12px;border-radius:4px;font-size:.7rem;">
+          <i class="fas fa-user-lock text-xs"></i> Entrar
+        </button>
+      </div>
+    </header>
+    <!-- Body -->
+    <div class="flex" style="min-height:460px;">
+      <!-- Sidebar -->
+      <aside class="da-sidebar" style="width:200px;flex-shrink:0;padding:16px;">
+        <div style="font-size:.6rem;color:#5c3d1a;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;padding:0 8px;">Navegação</div>
+        <ul class="space-y-0.5">
+          <li><button class="da-nav-item active w-full text-left flex items-center gap-2 px-3 py-2 text-xs" style="border-left:3px solid #c9882a;background:rgba(201,136,42,.15);">
+            <i class="fas fa-books w-4 text-center"></i> Acervo
+          </button></li>
+          <li><button class="da-nav-item w-full text-left flex items-center gap-2 px-3 py-2 text-xs border-l-2" style="border-color:transparent;">
+            <i class="fas fa-handshake w-4 text-center"></i> Empréstimos
+          </button></li>
+          <li><button class="da-nav-item w-full text-left flex items-center gap-2 px-3 py-2 text-xs border-l-2" style="border-color:transparent;">
+            <i class="fas fa-user-pen w-4 text-center"></i> Autores
+          </button></li>
+          <li><button class="da-nav-item w-full text-left flex items-center gap-2 px-3 py-2 text-xs border-l-2" style="border-color:transparent;">
+            <i class="fas fa-tags w-4 text-center"></i> Categorias
+          </button></li>
+        </ul>
+        <div style="border-top:1px solid #3a2509;margin-top:16px;padding-top:12px;">
+          <div class="da-stat px-3 py-2 mb-1">
+            <p style="font-size:.6rem;color:#7a6040;text-transform:uppercase;letter-spacing:.06em;">Total de Obras</p>
+            <p style="font-size:1.2rem;color:#f0c060;font-weight:700;font-family:'Playfair Display',serif;">24</p>
+          </div>
+          <p class="flex justify-between text-xs px-1 mt-2" style="color:#7a6040;"><span>Disponíveis</span><span style="color:#5a9e5a;">18</span></p>
+          <p class="flex justify-between text-xs px-1 mt-1" style="color:#7a6040;"><span>Emprestados</span><span style="color:#c9882a;">6</span></p>
+        </div>
+      </aside>
+      <!-- Main -->
+      <main class="flex-1 p-4">
+        <div class="flex gap-2 mb-4">
+          <select style="background:#120c05;border:1px solid #5c3d1a;color:#c9a96e;border-radius:4px;font-size:.7rem;padding:6px 8px;"><option>Todos os status</option></select>
+          <select style="background:#120c05;border:1px solid #5c3d1a;color:#c9a96e;border-radius:4px;font-size:.7rem;padding:6px 8px;"><option>Todas as categorias</option></select>
+        </div>
+        <div class="grid grid-cols-3 gap-4">
+          <div class="da-card rounded overflow-hidden">
+            <div class="da-cover1 h-28 flex items-center justify-center">
+              <span style="font-family:'Playfair Display',serif;font-size:2.5rem;color:rgba(240,192,96,.4);font-weight:700;">D</span>
+            </div>
+            <div class="p-3">
+              <span class="da-badge-disp text-xs px-2 py-0.5 rounded font-semibold">Disponível</span>
+              <p style="font-family:'Playfair Display',serif;font-size:.8rem;color:#e8d5b0;margin-top:6px;line-height:1.3;">Dom Casmurro</p>
+              <p style="font-size:.65rem;color:#7a6040;margin-top:2px;">Machado de Assis</p>
+            </div>
+          </div>
+          <div class="da-card rounded overflow-hidden">
+            <div class="da-cover2 h-28 flex items-center justify-center">
+              <span style="font-family:'Playfair Display',serif;font-size:2.5rem;color:rgba(90,158,90,.4);font-weight:700;">S</span>
+            </div>
+            <div class="p-3">
+              <span class="da-badge-emp text-xs px-2 py-0.5 rounded font-semibold">Emprestado</span>
+              <p style="font-family:'Playfair Display',serif;font-size:.8rem;color:#e8d5b0;margin-top:6px;line-height:1.3;">Senhor dos Anéis</p>
+              <p style="font-size:.65rem;color:#7a6040;margin-top:2px;">J.R.R. Tolkien</p>
+            </div>
+          </div>
+          <div class="da-card rounded overflow-hidden">
+            <div class="da-cover3 h-28 flex items-center justify-center">
+              <span style="font-family:'Playfair Display',serif;font-size:2.5rem;color:rgba(201,136,42,.4);font-weight:700;">1</span>
+            </div>
+            <div class="p-3">
+              <span class="da-badge-disp text-xs px-2 py-0.5 rounded font-semibold">Disponível</span>
+              <p style="font-family:'Playfair Display',serif;font-size:.8rem;color:#e8d5b0;margin-top:6px;line-height:1.3;">1984</p>
+              <p style="font-size:.65rem;color:#7a6040;margin-top:2px;">George Orwell</p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     TEMPLATE 3 — Midnight
+════════════════════════════════════════════════ -->
+<div id="template3" class="template-section">
+  <div class="mb-4">
+    <span class="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1 rounded-full border badge-new text-white">✨ NOVO</span>
+    <h2 class="text-white text-2xl font-bold mt-2">Midnight</h2>
+    <p class="text-gray-400 text-sm">Escuro moderno com acentos índigo/roxo brilhantes. Efeito neon sutil. Premium.</p>
+  </div>
+  <div class="preview-frame" id="t3">
+    <!-- Header -->
+    <header class="md-header px-6 flex items-center justify-between" style="height:64px;">
+      <div class="flex items-center gap-3">
+        <div class="md-glow" style="width:36px;height:36px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+          <i class="fas fa-book-open text-white text-sm"></i>
+        </div>
+        <div>
+          <div style="font-family:'Poppins',sans-serif;font-size:.95rem;color:#e2e8f0;font-weight:600;">Beserra Library</div>
+          <div style="font-size:.6rem;color:#475569;letter-spacing:.08em;text-transform:uppercase;">Biblioteca Familiar</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="md-search flex items-center gap-2 rounded-lg px-3 py-1.5">
+          <i class="fas fa-search text-xs" style="color:#475569;"></i>
+          <span style="font-size:.7rem;color:#475569;">Buscar livros...</span>
+        </div>
+        <button class="md-btn px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1">
+          <i class="fas fa-plus text-xs"></i> Novo Livro
+        </button>
+        <button style="border:1px solid rgba(255,255,255,.1);color:#94a3b8;padding:6px 12px;border-radius:8px;font-size:.7rem;">
+          <i class="fas fa-user-lock text-xs"></i> Entrar
+        </button>
+      </div>
+    </header>
+    <!-- Body -->
+    <div class="flex" style="min-height:460px;">
+      <!-- Sidebar -->
+      <aside class="md-sidebar" style="width:200px;flex-shrink:0;padding:16px;">
+        <div style="font-size:.6rem;color:#334155;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;padding:0 8px;">Menu</div>
+        <ul class="space-y-1">
+          <li><button class="md-nav-active w-full text-left flex items-center gap-2 px-3 py-2 text-xs rounded-r-lg">
+            <i class="fas fa-books w-4 text-center text-indigo-400"></i> Acervo
+          </button></li>
+          <li><button class="md-nav-item w-full text-left flex items-center gap-2 px-3 py-2 text-xs rounded-r-lg">
+            <i class="fas fa-handshake w-4 text-center"></i> Empréstimos
+          </button></li>
+          <li><button class="md-nav-item w-full text-left flex items-center gap-2 px-3 py-2 text-xs rounded-r-lg">
+            <i class="fas fa-user-pen w-4 text-center"></i> Autores
+          </button></li>
+          <li><button class="md-nav-item w-full text-left flex items-center gap-2 px-3 py-2 text-xs rounded-r-lg">
+            <i class="fas fa-tags w-4 text-center"></i> Categorias
+          </button></li>
+        </ul>
+        <div style="border-top:1px solid rgba(255,255,255,.06);margin-top:16px;padding-top:12px;padding:12px 8px 0;">
+          <div style="background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);border-radius:8px;padding:10px;margin-bottom:8px;">
+            <p style="font-size:.6rem;color:#475569;text-transform:uppercase;letter-spacing:.06em;">Total de Livros</p>
+            <p style="font-size:1.4rem;color:#818cf8;font-weight:700;">24</p>
+          </div>
+          <p class="flex justify-between text-xs mt-1" style="color:#475569;"><span>Disponíveis</span><span style="color:#34d399;">18</span></p>
+          <p class="flex justify-between text-xs mt-1" style="color:#475569;"><span>Emprestados</span><span style="color:#fbbf24;">6</span></p>
+        </div>
+      </aside>
+      <!-- Main -->
+      <main class="flex-1 p-4">
+        <div class="flex gap-2 mb-4">
+          <select style="background:#161b27;border:1px solid rgba(255,255,255,.08);color:#94a3b8;border-radius:8px;font-size:.7rem;padding:6px 8px;"><option>Todos os status</option></select>
+          <select style="background:#161b27;border:1px solid rgba(255,255,255,.08);color:#94a3b8;border-radius:8px;font-size:.7rem;padding:6px 8px;"><option>Todas as categorias</option></select>
+        </div>
+        <div class="grid grid-cols-3 gap-4">
+          <div class="md-card rounded-xl overflow-hidden">
+            <div class="md-cover1 h-28 flex items-center justify-center">
+              <span style="font-size:2.5rem;color:rgba(255,255,255,.3);font-weight:700;font-family:'Poppins',sans-serif;">D</span>
+            </div>
+            <div class="p-3">
+              <span class="md-badge-disp text-xs px-2 py-0.5 rounded-full font-semibold">Disponível</span>
+              <p style="font-size:.8rem;color:#e2e8f0;margin-top:6px;font-weight:500;">Dom Casmurro</p>
+              <p style="font-size:.65rem;color:#475569;margin-top:2px;">Machado de Assis</p>
+            </div>
+          </div>
+          <div class="md-card rounded-xl overflow-hidden">
+            <div class="md-cover2 h-28 flex items-center justify-center">
+              <span style="font-size:2.5rem;color:rgba(255,255,255,.3);font-weight:700;font-family:'Poppins',sans-serif;">S</span>
+            </div>
+            <div class="p-3">
+              <span class="md-badge-emp text-xs px-2 py-0.5 rounded-full font-semibold">Emprestado</span>
+              <p style="font-size:.8rem;color:#e2e8f0;margin-top:6px;font-weight:500;">Senhor dos Anéis</p>
+              <p style="font-size:.65rem;color:#475569;margin-top:2px;">J.R.R. Tolkien</p>
+            </div>
+          </div>
+          <div class="md-card rounded-xl overflow-hidden">
+            <div class="md-cover3 h-28 flex items-center justify-center">
+              <span style="font-size:2.5rem;color:rgba(255,255,255,.3);font-weight:700;font-family:'Poppins',sans-serif;">1</span>
+            </div>
+            <div class="p-3">
+              <span class="md-badge-disp text-xs px-2 py-0.5 rounded-full font-semibold">Disponível</span>
+              <p style="font-size:.8rem;color:#e2e8f0;margin-top:6px;font-weight:500;">1984</p>
+              <p style="font-size:.65rem;color:#475569;margin-top:2px;">George Orwell</p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     TEMPLATE 4 — Verde Natureza
+════════════════════════════════════════════════ -->
+<div id="template4" class="template-section">
+  <div class="mb-4">
+    <span class="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1 rounded-full border badge-new text-white">✨ NOVO</span>
+    <h2 class="text-white text-2xl font-bold mt-2">Verde Natureza</h2>
+    <p class="text-gray-400 text-sm">Orgânico, acolhedor. Header escuro verde com corpo claro. Transmite tranquilidade.</p>
+  </div>
+  <div class="preview-frame" id="t4">
+    <!-- Header -->
+    <header class="gr-header px-6 flex items-center justify-between" style="height:64px;">
+      <div class="flex items-center gap-3">
+        <div style="width:36px;height:36px;background:rgba(255,255,255,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.2);">
+          <i class="fas fa-leaf text-green-300 text-sm"></i>
+        </div>
+        <div>
+          <div style="font-family:'Lato',sans-serif;font-size:1rem;color:white;font-weight:700;letter-spacing:.02em;">Beserra Library</div>
+          <div style="font-size:.6rem;color:rgba(255,255,255,.5);letter-spacing:.1em;text-transform:uppercase;">Biblioteca Familiar</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="gr-search flex items-center gap-2 rounded-lg px-3 py-1.5">
+          <i class="fas fa-search text-xs" style="color:#7a9e7a;"></i>
+          <span style="font-size:.7rem;color:#7a9e7a;">Buscar livros...</span>
+        </div>
+        <button class="gr-btn px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1">
+          <i class="fas fa-plus text-xs"></i> Novo Livro
+        </button>
+        <button style="border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);padding:6px 12px;border-radius:8px;font-size:.7rem;">
+          <i class="fas fa-user-lock text-xs"></i> Entrar
+        </button>
+      </div>
+    </header>
+    <!-- Body -->
+    <div class="flex" style="background:#f0f7f0;min-height:460px;padding:16px;gap:16px;">
+      <!-- Sidebar -->
+      <aside style="width:184px;flex-shrink:0;">
+        <div class="gr-sidebar overflow-hidden">
+          <div style="padding:12px 16px;border-bottom:1px solid #c8e6c9;">
+            <p style="font-size:.6rem;color:#7a9e7a;font-weight:700;letter-spacing:.1em;text-transform:uppercase;">Menu</p>
+          </div>
+          <ul style="padding:8px;">
+            <li><button class="gr-nav-active w-full text-left flex items-center gap-2 px-3 py-2 text-xs" style="border-radius:0 8px 8px 0;margin-bottom:2px;">
+              <i class="fas fa-books w-4 text-center text-green-700"></i> Acervo de Livros
+            </button></li>
+            <li><button class="gr-nav-item w-full text-left flex items-center gap-2 px-3 py-2 text-xs" style="margin-bottom:2px;">
+              <i class="fas fa-handshake w-4 text-center"></i> Empréstimos
+            </button></li>
+            <li><button class="gr-nav-item w-full text-left flex items-center gap-2 px-3 py-2 text-xs" style="margin-bottom:2px;">
+              <i class="fas fa-user-pen w-4 text-center"></i> Autores
+            </button></li>
+            <li><button class="gr-nav-item w-full text-left flex items-center gap-2 px-3 py-2 text-xs">
+              <i class="fas fa-tags w-4 text-center"></i> Categorias
+            </button></li>
+          </ul>
+          <div style="padding:12px 16px;border-top:1px solid #c8e6c9;">
+            <div class="gr-stat p-2 mb-2 text-center">
+              <p style="font-size:.6rem;color:#4a6741;font-weight:600;">Total de Livros</p>
+              <p style="font-size:1.4rem;color:#2e7d32;font-weight:700;font-family:'Lato',sans-serif;">24</p>
+            </div>
+            <p class="flex justify-between text-xs" style="color:#4a6741;margin-bottom:4px;"><span>Disponíveis</span><span style="color:#2e7d32;font-weight:700;">18</span></p>
+            <p class="flex justify-between text-xs" style="color:#4a6741;"><span>Emprestados</span><span style="color:#e65100;font-weight:700;">6</span></p>
+          </div>
+        </div>
+      </aside>
+      <!-- Main -->
+      <main class="flex-1">
+        <div class="flex gap-2 mb-4">
+          <select style="background:white;border:1px solid #c8e6c9;color:#4a6741;border-radius:8px;font-size:.7rem;padding:6px 8px;"><option>Todos os status</option></select>
+          <select style="background:white;border:1px solid #c8e6c9;color:#4a6741;border-radius:8px;font-size:.7rem;padding:6px 8px;"><option>Todas as categorias</option></select>
+        </div>
+        <div class="grid grid-cols-3 gap-4">
+          <div class="gr-card overflow-hidden">
+            <div class="gr-cover1 h-28 flex items-center justify-center" style="border-radius:12px 12px 0 0;">
+              <span style="font-size:2.5rem;color:rgba(255,255,255,.4);font-weight:700;font-family:'Lato',sans-serif;">D</span>
+            </div>
+            <div class="p-3">
+              <span class="gr-badge-disp text-xs px-2 py-0.5 rounded-full font-semibold">Disponível</span>
+              <p style="font-size:.8rem;color:#1a2e1a;margin-top:6px;font-weight:600;">Dom Casmurro</p>
+              <p style="font-size:.65rem;color:#4a6741;margin-top:2px;">Machado de Assis</p>
+            </div>
+          </div>
+          <div class="gr-card overflow-hidden">
+            <div class="gr-cover2 h-28 flex items-center justify-center" style="border-radius:12px 12px 0 0;">
+              <span style="font-size:2.5rem;color:rgba(255,255,255,.4);font-weight:700;font-family:'Lato',sans-serif;">S</span>
+            </div>
+            <div class="p-3">
+              <span class="gr-badge-emp text-xs px-2 py-0.5 rounded-full font-semibold">Emprestado</span>
+              <p style="font-size:.8rem;color:#1a2e1a;margin-top:6px;font-weight:600;">Senhor dos Anéis</p>
+              <p style="font-size:.65rem;color:#4a6741;margin-top:2px;">J.R.R. Tolkien</p>
+            </div>
+          </div>
+          <div class="gr-card overflow-hidden">
+            <div class="gr-cover3 h-28 flex items-center justify-center" style="border-radius:12px 12px 0 0;">
+              <span style="font-size:2.5rem;color:rgba(255,255,255,.4);font-weight:700;font-family:'Lato',sans-serif;">1</span>
+            </div>
+            <div class="p-3">
+              <span class="gr-badge-disp text-xs px-2 py-0.5 rounded-full font-semibold">Disponível</span>
+              <p style="font-size:.8rem;color:#1a2e1a;margin-top:6px;font-weight:600;">1984</p>
+              <p style="font-size:.65rem;color:#4a6741;margin-top:2px;">George Orwell</p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     TEMPLATE 5 — Cream Minimalista
+════════════════════════════════════════════════ -->
+<div id="template5" class="template-section">
+  <div class="mb-4">
+    <span class="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1 rounded-full border badge-new text-white">✨ NOVO</span>
+    <h2 class="text-white text-2xl font-bold mt-2">Cream Minimalista</h2>
+    <p class="text-gray-400 text-sm">Sofisticado, tipografia forte. Creme e marrom escuro. Inspira bibliotecas clássicas.</p>
+  </div>
+  <div class="preview-frame" id="t5">
+    <!-- Header -->
+    <header class="cr-header px-6 flex items-center justify-between" style="height:64px;">
+      <div class="flex items-center gap-3">
+        <div style="width:36px;height:36px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:6px;display:flex;align-items:center;justify-content:center;">
+          <i class="fas fa-book-open" style="color:#faf7f2;font-size:.85rem;"></i>
+        </div>
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#faf7f2;font-weight:700;letter-spacing:.02em;">Beserra Library</div>
+          <div style="font-size:.6rem;color:rgba(250,247,242,.4);letter-spacing:.12em;text-transform:uppercase;">Biblioteca Familiar</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="cr-search flex items-center gap-2 rounded px-3 py-1.5">
+          <i class="fas fa-search text-xs" style="color:#b5a08a;"></i>
+          <span style="font-size:.7rem;color:#b5a08a;">Buscar livros...</span>
+        </div>
+        <button class="cr-btn px-3 py-1.5 text-xs font-semibold flex items-center gap-1" style="border-radius:4px;">
+          <i class="fas fa-plus text-xs"></i> Novo Livro
+        </button>
+        <button style="border:1px solid rgba(255,255,255,.15);color:rgba(250,247,242,.6);padding:6px 12px;border-radius:4px;font-size:.7rem;">
+          <i class="fas fa-user-lock text-xs"></i> Entrar
+        </button>
+      </div>
+    </header>
+    <!-- Body -->
+    <div class="flex" style="background:#faf7f2;min-height:460px;gap:20px;padding:16px;">
+      <!-- Sidebar -->
+      <aside style="width:180px;flex-shrink:0;">
+        <div class="cr-sidebar overflow-hidden" style="border-radius:8px;">
+          <div style="padding:12px 16px;border-bottom:1px solid #e8dfc8;">
+            <p style="font-size:.6rem;color:#b5a08a;font-weight:700;letter-spacing:.12em;text-transform:uppercase;">Navegação</p>
+          </div>
+          <ul style="padding:8px;display:flex;flex-direction:column;gap:2px;">
+            <li><button class="cr-nav-active w-full text-left flex items-center gap-2 px-3 py-2 text-xs">
+              <i class="fas fa-books w-4 text-center"></i> Acervo de Livros
+            </button></li>
+            <li><button class="cr-nav-item w-full text-left flex items-center gap-2 px-3 py-2 text-xs">
+              <i class="fas fa-handshake w-4 text-center"></i> Empréstimos
+            </button></li>
+            <li><button class="cr-nav-item w-full text-left flex items-center gap-2 px-3 py-2 text-xs">
+              <i class="fas fa-user-pen w-4 text-center"></i> Autores
+            </button></li>
+            <li><button class="cr-nav-item w-full text-left flex items-center gap-2 px-3 py-2 text-xs">
+              <i class="fas fa-tags w-4 text-center"></i> Categorias
+            </button></li>
+          </ul>
+          <div style="padding:12px 16px;border-top:1px solid #e8dfc8;">
+            <p style="font-family:'Playfair Display',serif;font-size:1.6rem;color:#2c2416;font-weight:700;line-height:1;">24</p>
+            <p style="font-size:.6rem;color:#b5a08a;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">obras no acervo</p>
+            <p class="flex justify-between text-xs" style="color:#7a6a52;margin-bottom:3px;"><span>Disponíveis</span><span class="cr-accent font-semibold">18</span></p>
+            <p class="flex justify-between text-xs" style="color:#7a6a52;"><span>Emprestados</span><span style="color:#854d0e;font-weight:600;">6</span></p>
+          </div>
+        </div>
+      </aside>
+      <!-- Main -->
+      <main class="flex-1">
+        <div class="flex gap-2 mb-4">
+          <select style="background:white;border:1px solid #e8dfc8;color:#7a6a52;border-radius:4px;font-size:.7rem;padding:6px 8px;"><option>Todos os status</option></select>
+          <select style="background:white;border:1px solid #e8dfc8;color:#7a6a52;border-radius:4px;font-size:.7rem;padding:6px 8px;"><option>Todas as categorias</option></select>
+        </div>
+        <div class="grid grid-cols-3 gap-4">
+          <div class="cr-card overflow-hidden">
+            <div class="cr-cover1 h-28 flex items-center justify-center">
+              <span style="font-family:'Playfair Display',serif;font-size:2.5rem;color:rgba(255,255,255,.25);font-weight:700;">D</span>
+            </div>
+            <div class="p-3">
+              <span class="cr-badge-disp text-xs px-2 py-0.5 font-semibold" style="border-radius:3px;">Disponível</span>
+              <p style="font-family:'Playfair Display',serif;font-size:.85rem;color:#2c2416;margin-top:6px;font-weight:600;">Dom Casmurro</p>
+              <p style="font-size:.65rem;color:#7a6a52;margin-top:2px;">Machado de Assis</p>
+            </div>
+          </div>
+          <div class="cr-card overflow-hidden">
+            <div class="cr-cover2 h-28 flex items-center justify-center">
+              <span style="font-family:'Playfair Display',serif;font-size:2.5rem;color:rgba(255,255,255,.25);font-weight:700;">S</span>
+            </div>
+            <div class="p-3">
+              <span class="cr-badge-emp text-xs px-2 py-0.5 font-semibold" style="border-radius:3px;">Emprestado</span>
+              <p style="font-family:'Playfair Display',serif;font-size:.85rem;color:#2c2416;margin-top:6px;font-weight:600;">Senhor dos Anéis</p>
+              <p style="font-size:.65rem;color:#7a6a52;margin-top:2px;">J.R.R. Tolkien</p>
+            </div>
+          </div>
+          <div class="cr-card overflow-hidden">
+            <div class="cr-cover3 h-28 flex items-center justify-center">
+              <span style="font-family:'Playfair Display',serif;font-size:2.5rem;color:rgba(255,255,255,.25);font-weight:700;">1</span>
+            </div>
+            <div class="p-3">
+              <span class="cr-badge-disp text-xs px-2 py-0.5 font-semibold" style="border-radius:3px;">Disponível</span>
+              <p style="font-family:'Playfair Display',serif;font-size:.85rem;color:#2c2416;margin-top:6px;font-weight:600;">1984</p>
+              <p style="font-size:.65rem;color:#7a6a52;margin-top:2px;">George Orwell</p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<!-- ── Rodapé com CTA ── -->
+<div class="mt-10 bg-gray-900 border border-gray-800 rounded-2xl p-6 text-center">
+  <p class="text-gray-300 font-semibold text-lg mb-1">Qual template você quer aplicar?</p>
+  <p class="text-gray-500 text-sm mb-4">Me diga o número (1 a 5) e aplico automaticamente no seu sistema.</p>
+  <div class="flex flex-wrap justify-center gap-3">
+    <span class="bg-gray-800 text-gray-300 text-xs px-4 py-2 rounded-full border border-gray-700">1 · Violet Clean (atual)</span>
+    <span class="bg-gray-800 text-gray-300 text-xs px-4 py-2 rounded-full border border-gray-700">2 · Dark Academia</span>
+    <span class="bg-gray-800 text-gray-300 text-xs px-4 py-2 rounded-full border border-gray-700">3 · Midnight</span>
+    <span class="bg-gray-800 text-gray-300 text-xs px-4 py-2 rounded-full border border-gray-700">4 · Verde Natureza</span>
+    <span class="bg-gray-800 text-gray-300 text-xs px-4 py-2 rounded-full border border-gray-700">5 · Cream Minimalista</span>
+  </div>
+</div>
+
+</div><!-- /max-w -->
+
+<script>
+function showTemplate(n) {
+  for(let i = 1; i <= 5; i++) {
+    document.getElementById('template' + i).classList.toggle('active', i === n);
+    const btn = document.getElementById('tabBtn' + i);
+    btn.classList.toggle('active', i === n);
+  }
+}
+</script>
+</body>
+</html>
