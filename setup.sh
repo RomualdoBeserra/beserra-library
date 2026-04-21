@@ -334,32 +334,74 @@ info "Instalando dependências npm..."
 npm install --legacy-peer-deps
 log "Dependências instaladas"
 
+# ── CORREÇÃO BUS ERROR ──────────────────────────────────────────────────────
+# O Bus error NÃO é causado pelo Node.js (NODE_OPTIONS não resolve).
+# A causa real é o binário nativo do esbuild (ELF/Go) — o kernel da VM não
+# consegue mapeá-lo em memória quando RAM < 1GB → SIGBUS no processo filho.
+#
+# Solução: substituir o binário nativo do esbuild pela versão WASM (JS puro),
+# que roda inteiramente dentro do Node.js sem precisar de mmap de binários ELF.
+# ────────────────────────────────────────────────────────────────────────────
+info "Substituindo esbuild nativo por versão WASM (evita Bus error em VMs com pouca RAM)..."
+
+ESBUILD_VERSION=$(node -e "console.log(require('./node_modules/esbuild/package.json').version)" 2>/dev/null || echo "")
+if [ -z "$ESBUILD_VERSION" ]; then
+  warn "Não foi possível detectar versão do esbuild — usando fallback 0.25.0"
+  ESBUILD_VERSION="0.25.0"
+fi
+info "Versão esbuild detectada: ${ESBUILD_VERSION}"
+
+# Instala esbuild-wasm na mesma versão do esbuild atual
+npm install --save-dev "esbuild-wasm@${ESBUILD_VERSION}" --legacy-peer-deps 2>/dev/null \
+  || npm install --save-dev esbuild-wasm --legacy-peer-deps
+
+# Substitui o binário nativo pelo wrapper WASM
+ESBUILD_BIN="$APP_DIR/node_modules/.bin/esbuild"
+ESBUILD_WASM_JS="$APP_DIR/node_modules/esbuild-wasm/bin/esbuild"
+
+if [ -f "$ESBUILD_WASM_JS" ]; then
+  # Cria wrapper que invoca esbuild-wasm em vez do binário nativo
+  cat > "$ESBUILD_BIN" << 'WRAPPER'
+#!/usr/bin/env node
+// Wrapper: usa esbuild-wasm (JS puro) em vez do binário nativo ELF
+// Evita Bus error em VMs GCP com pouca RAM (e2-micro, e2-small)
+const path = require('path');
+const wasmBin = path.resolve(__dirname, '../esbuild-wasm/bin/esbuild');
+require(wasmBin);
+WRAPPER
+  chmod +x "$ESBUILD_BIN"
+
+  # Aponta o require do esbuild para esbuild-wasm
+  ESBUILD_PKG="$APP_DIR/node_modules/esbuild/lib/main.js"
+  if [ -f "$ESBUILD_PKG" ]; then
+    # Faz backup do original
+    cp "$ESBUILD_PKG" "${ESBUILD_PKG}.bak" 2>/dev/null || true
+    # Redireciona: substitui o carregamento do binário nativo pelo WASM
+    node -e "
+      const fs = require('fs');
+      let src = fs.readFileSync('$ESBUILD_PKG', 'utf8');
+      // Redireciona o módulo principal para esbuild-wasm
+      if (!src.includes('esbuild-wasm')) {
+        fs.writeFileSync('$ESBUILD_PKG', 'module.exports = require(\"esbuild-wasm\");');
+        console.log('esbuild redirecionado para esbuild-wasm');
+      } else {
+        console.log('esbuild já aponta para wasm');
+      }
+    " 2>/dev/null || warn "Não foi possível redirecionar esbuild/lib/main.js"
+  fi
+  log "esbuild-wasm instalado e configurado"
+else
+  warn "esbuild-wasm não encontrado — build pode falhar com Bus error"
+fi
+
 info "Fazendo build da aplicação..."
-# NODE_OPTIONS limita heap do Node.js para evitar Bus error em VMs com pouca RAM
-# Calcula heap seguro: 40% da RAM total disponível (RAM + swap), máximo 1024MB
 TOTAL_MEM=$(free -m | awk '/^Mem/{m=$2} /^Swap/{s=$2} END{printf "%d", (m+s)*0.4}')
 HEAP_MB=$(( TOTAL_MEM > 1024 ? 1024 : (TOTAL_MEM < 256 ? 256 : TOTAL_MEM) ))
-info "Heap Node.js definido em ${HEAP_MB}MB"
+info "Heap Node.js: ${HEAP_MB}MB"
 
-# Tenta o build com retry em caso de falha de memória
-build_with_retry() {
-  local attempt=1
-  local max=3
-  local heap=$1
-  while [ $attempt -le $max ]; do
-    info "Tentativa de build ${attempt}/${max} (heap=${heap}MB)..."
-    NODE_OPTIONS="--max-old-space-size=${heap}" npm run build && return 0
-    warn "Build falhou na tentativa ${attempt}. Aguardando 5s..."
-    sleep 5
-    attempt=$(( attempt + 1 ))
-    heap=$(( heap - 64 ))  # Reduz heap a cada tentativa
-    [ $heap -lt 128 ] && heap=128
-  done
-  return 1
-}
-
-if ! build_with_retry "$HEAP_MB"; then
-  error "Build falhou após 3 tentativas. Verifique a memória disponível com: free -h"
+NODE_OPTIONS="--max-old-space-size=${HEAP_MB}" npm run build
+if [ $? -ne 0 ]; then
+  error "Build falhou. Verifique a memória com: free -h"
 fi
 log "Build concluído — dist/ gerado"
 
