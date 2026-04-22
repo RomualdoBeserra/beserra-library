@@ -201,7 +201,7 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
           </div>
         </div>
         <div id="livros-container" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-          <div class="col-span-full flex items-center justify-center py-16 text-gray-400"><div class="loading-spinner"></div></div>
+          <div class="col-span-full flex items-center justify-center py-16 style="color:#7a6040"><div class="loading-spinner"></div></div>
         </div>
       </div>
 
@@ -220,7 +220,7 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
           <button onclick="filterEmprestimos('cancelado')" id="ef-cancelado" class="emp-filter-btn px-3 py-1.5 text-xs font-semibold" style="border-radius:3px;background:#1a1209;border:1px solid #3a2509;color:#c9a96e;">Cancelado</button>
         </div>
         <div id="emprestimos-container" class="space-y-4">
-          <div class="flex items-center justify-center py-16 text-gray-400"><div class="loading-spinner"></div></div>
+          <div class="flex items-center justify-center py-16 style="color:#7a6040"><div class="loading-spinner"></div></div>
         </div>
       </div>
 
@@ -412,37 +412,37 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
 
 <!-- Modal Trocar Senha -->
 <div id="modal-senha" class="modal-overlay fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-  <div class="modal-box bg-white rounded-2xl shadow-2xl w-full max-w-sm">
-    <div class="flex items-center justify-between p-6 border-b border-gray-100">
-      <h3 class="font-serif text-lg font-bold text-gray-800"><i class="fas fa-key text-violet-500 mr-2"></i>Trocar Senha</h3>
-      <button onclick="closeModal('modal-senha')" class="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100"><i class="fas fa-times"></i></button>
+  <div class="modal-box w-full max-w-sm">
+    <div class="flex items-center justify-between p-6" style="border-bottom:1px solid #3a2509">
+      <h3 class="font-serif text-lg font-bold" style="color:#f0c060"><i class="fas fa-key" style="color:#c9882a mr-2"></i>Trocar Senha</h3>
+      <button onclick="closeModal('modal-senha')" class="w-8 h-8 flex items-center justify-center" style="border-radius:50%;color:#7a6040"><i class="fas fa-times"></i></button>
     </div>
     <form id="form-senha" onsubmit="trocarSenha(event)" class="p-6 space-y-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Senha atual</label>
+        <label class="block text-sm font-medium mb-1" style="color:#c9a96e">Senha atual</label>
         <div class="relative">
           <input id="senha-atual" type="password" required placeholder="••••••••"
-            class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition pr-10"/>
-          <button type="button" onclick="toggleSenhaVis('senha-atual')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"><i class="fas fa-eye text-sm"></i></button>
+            class="w-full px-3 py-2.5 text-sm outline-none transition pr-10"/>
+          <button type="button" onclick="toggleSenhaVis('senha-atual')" class="absolute right-3 top-1/2 -translate-y-1/2" style="color:#7a6040"><i class="fas fa-eye text-sm"></i></button>
         </div>
       </div>
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Nova senha <span class="text-gray-400 font-normal">(mín. 6 caracteres)</span></label>
+        <label class="block text-sm font-medium mb-1" style="color:#c9a96e">Nova senha <span class="font-normal" style="color:#7a6040">(mín. 6 caracteres)</span></label>
         <div class="relative">
           <input id="senha-nova" type="password" required minlength="6" placeholder="••••••••"
-            class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition pr-10"/>
-          <button type="button" onclick="toggleSenhaVis('senha-nova')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"><i class="fas fa-eye text-sm"></i></button>
+            class="w-full px-3 py-2.5 text-sm outline-none transition pr-10"/>
+          <button type="button" onclick="toggleSenhaVis('senha-nova')" class="absolute right-3 top-1/2 -translate-y-1/2" style="color:#7a6040"><i class="fas fa-eye text-sm"></i></button>
         </div>
       </div>
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Confirmar nova senha</label>
+        <label class="block text-sm font-medium mb-1" style="color:#c9a96e">Confirmar nova senha</label>
         <input id="senha-confirma" type="password" required minlength="6" placeholder="••••••••"
-          class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-gray-50 focus:bg-white focus:border-violet-400 outline-none transition"/>
+          class="w-full px-3 py-2.5 text-sm outline-none transition"/>
       </div>
       <p id="senha-erro" class="text-xs text-red-600 hidden"></p>
       <div class="flex gap-3 pt-1">
-        <button type="button" onclick="closeModal('modal-senha')" class="flex-1 border border-gray-200 text-gray-600 rounded-xl py-2.5 text-sm hover:bg-gray-50">Cancelar</button>
-        <button type="submit" class="flex-1 bg-violet-600 hover:bg-violet-700 text-white rounded-xl py-2.5 text-sm font-semibold">Salvar</button>
+        <button type="button" onclick="closeModal('modal-senha')" class="flex-1 py-2.5 text-sm" style="border:1px solid #5c3d1a;color:#c9a96e;border-radius:3px">Cancelar</button>
+        <button type="submit" class="flex-1 btn-primary py-2.5 text-sm font-semibold" style="border-radius:3px">Salvar</button>
       </div>
     </form>
   </div>
@@ -450,19 +450,19 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
 
 <!-- Modal Detalhes Livro -->
 <div id="modal-detalhe" class="modal-overlay fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-  <div class="modal-box bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+  <div class="modal-box w-full max-w-lg max-h-[90vh] overflow-y-auto">
     <div id="detalhe-content" class="p-6"></div>
   </div>
 </div>
 
 <!-- ═══════ MODAL EMPRÉSTIMO (WIZARD 3 PASSOS) ═══════ -->
 <div id="modal-emprestimo" class="modal-overlay fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-  <div class="modal-box bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[95vh] overflow-y-auto">
+  <div class="modal-box w-full max-w-2xl max-h-[95vh] overflow-y-auto">
 
     <!-- Header -->
-    <div class="flex items-center justify-between p-6 border-b border-gray-100">
-      <h3 class="font-serif text-xl font-bold text-gray-800">Solicitar Empréstimo</h3>
-      <button onclick="closeModal('modal-emprestimo')" class="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100"><i class="fas fa-times"></i></button>
+    <div class="flex items-center justify-between p-6" style="border-bottom:1px solid #3a2509">
+      <h3 class="font-serif text-xl font-bold" style="color:#f0c060">Solicitar Empréstimo</h3>
+      <button onclick="closeModal('modal-emprestimo')" class="w-8 h-8 flex items-center justify-center" style="border-radius:50%;color:#7a6040"><i class="fas fa-times"></i></button>
     </div>
 
     <!-- Steps indicator -->
@@ -470,17 +470,17 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
       <div class="flex items-center gap-2">
         <div id="step-ind-1" class="step-active flex flex-col items-center gap-1 flex-shrink-0">
           <div class="step-circle">1</div>
-          <span class="text-xs text-violet-600 font-semibold hidden sm:block">Seus Dados</span>
+          <span class="text-xs font-semibold hidden sm:block" style="color:#c9882a">Seus Dados</span>
         </div>
         <div id="step-line-1" class="step-line"></div>
         <div id="step-ind-2" class="step-pending flex flex-col items-center gap-1 flex-shrink-0">
           <div class="step-circle">2</div>
-          <span class="text-xs text-gray-400 hidden sm:block">Endereço & Frete</span>
+          <span class="text-xs hidden sm:block" style="color:#5c3d1a">Endereço & Frete</span>
         </div>
         <div id="step-line-2" class="step-line"></div>
         <div id="step-ind-3" class="step-pending flex flex-col items-center gap-1 flex-shrink-0">
           <div class="step-circle">3</div>
-          <span class="text-xs text-gray-400 hidden sm:block">Boleto</span>
+          <span class="text-xs hidden sm:block" style="color:#5c3d1a">Boleto</span>
         </div>
       </div>
     </div>
@@ -489,28 +489,28 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
 
       <!-- PASSO 1: Dados pessoais -->
       <div id="emp-step-1">
-        <div id="emp-livro-info" class="flex gap-4 bg-violet-50 rounded-xl p-4 mb-5"></div>
-        <h4 class="font-semibold text-gray-800 mb-4">Seus dados para contato</h4>
+        <div id="emp-livro-info" class="flex gap-4 p-4 mb-5" style="background:#1f1508;border:1px solid #3a2509;border-radius:3px"></div>
+        <h4 class="font-semibold mb-4" style="color:#e8d5b0">Seus dados para contato</h4>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="sm:col-span-2">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Nome completo <span class="text-red-500">*</span></label>
-            <input id="emp-nome" type="text" required placeholder="Seu nome completo" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"/>
+            <label class="block text-sm font-medium mb-1" style="color:#c9a96e">Nome completo <span class="text-red-500">*</span></label>
+            <input id="emp-nome" type="text" required placeholder="Seu nome completo" class="w-full px-3 py-2 text-sm"/>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">E-mail <span class="text-red-500">*</span></label>
-            <input id="emp-email" type="email" required placeholder="seu@email.com" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"/>
+            <label class="block text-sm font-medium mb-1" style="color:#c9a96e">E-mail <span class="text-red-500">*</span></label>
+            <input id="emp-email" type="email" required placeholder="seu@email.com" class="w-full px-3 py-2 text-sm"/>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
-            <input id="emp-telefone" type="tel" placeholder="(11) 99999-9999" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"/>
+            <label class="block text-sm font-medium mb-1" style="color:#c9a96e">Telefone</label>
+            <input id="emp-telefone" type="tel" placeholder="(11) 99999-9999" class="w-full px-3 py-2 text-sm"/>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">CPF <span class="text-red-500">*</span></label>
-            <input id="emp-cpf" type="text" required placeholder="000.000.000-00" maxlength="14" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"/>
+            <label class="block text-sm font-medium mb-1" style="color:#c9a96e">CPF <span class="text-red-500">*</span></label>
+            <input id="emp-cpf" type="text" required placeholder="000.000.000-00" maxlength="14" class="w-full px-3 py-2 text-sm"/>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Prazo desejado</label>
-            <select id="emp-prazo" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50">
+            <label class="block text-sm font-medium mb-1" style="color:#c9a96e">Prazo desejado</label>
+            <select id="emp-prazo" class="w-full px-3 py-2 text-sm">
               <option value="7">7 dias</option>
               <option value="14" selected>14 dias</option>
               <option value="21">21 dias</option>
@@ -519,45 +519,45 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
           </div>
         </div>
         <div class="flex justify-end mt-6">
-          <button onclick="empStep2()" class="px-6 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg text-sm font-medium flex items-center gap-2">Próximo <i class="fas fa-arrow-right"></i></button>
+          <button onclick="empStep2()" class="px-6 py-2 btn-primary text-sm font-medium flex items-center gap-2" style="border-radius:3px">Próximo <i class="fas fa-arrow-right"></i></button>
         </div>
       </div>
 
       <!-- PASSO 2: Endereço + Frete -->
       <div id="emp-step-2" class="hidden">
-        <h4 class="font-semibold text-gray-800 mb-4">Endereço de entrega</h4>
+        <h4 class="font-semibold mb-4" style="color:#e8d5b0">Endereço de entrega</h4>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">CEP <span class="text-red-500">*</span></label>
+            <label class="block text-sm font-medium mb-1" style="color:#c9a96e">CEP <span class="text-red-500">*</span></label>
             <div class="relative">
-              <input id="emp-cep" type="text" required placeholder="00000-000" maxlength="9" inputmode="numeric" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 pr-10"/>
-              <button type="button" onclick="buscarCEP()" class="absolute right-2 top-1/2 -translate-y-1/2 text-violet-500 hover:text-violet-700"><i class="fas fa-search text-sm"></i></button>
+              <input id="emp-cep" type="text" required placeholder="00000-000" maxlength="9" inputmode="numeric" class="w-full px-3 py-2 text-sm pr-10"/>
+              <button type="button" onclick="buscarCEP()" class="absolute right-2 top-1/2 -translate-y-1/2" style="color:#c9882a"><i class="fas fa-search text-sm"></i></button>
             </div>
-            <p id="cep-status" class="text-xs mt-1 text-gray-400"></p>
+            <p id="cep-status" class="text-xs mt-1" style="color:#7a6040"></p>
           </div>
           <div class="sm:col-span-2">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Logradouro <span class="text-red-500">*</span></label>
-            <input id="emp-logradouro" type="text" required placeholder="Rua, Avenida..." class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"/>
+            <label class="block text-sm font-medium mb-1" style="color:#c9a96e">Logradouro <span class="text-red-500">*</span></label>
+            <input id="emp-logradouro" type="text" required placeholder="Rua, Avenida..." class="w-full px-3 py-2 text-sm"/>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Número <span class="text-red-500">*</span></label>
-            <input id="emp-numero" type="text" required placeholder="123" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"/>
+            <label class="block text-sm font-medium mb-1" style="color:#c9a96e">Número <span class="text-red-500">*</span></label>
+            <input id="emp-numero" type="text" required placeholder="123" class="w-full px-3 py-2 text-sm"/>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Complemento</label>
-            <input id="emp-complemento" type="text" placeholder="Apto, Bloco..." class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"/>
+            <label class="block text-sm font-medium mb-1" style="color:#c9a96e">Complemento</label>
+            <input id="emp-complemento" type="text" placeholder="Apto, Bloco..." class="w-full px-3 py-2 text-sm"/>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Bairro</label>
-            <input id="emp-bairro" type="text" placeholder="Bairro" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"/>
+            <label class="block text-sm font-medium mb-1" style="color:#c9a96e">Bairro</label>
+            <input id="emp-bairro" type="text" placeholder="Bairro" class="w-full px-3 py-2 text-sm"/>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Cidade</label>
-            <input id="emp-cidade" type="text" placeholder="Cidade" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"/>
+            <label class="block text-sm font-medium mb-1" style="color:#c9a96e">Cidade</label>
+            <input id="emp-cidade" type="text" placeholder="Cidade" class="w-full px-3 py-2 text-sm"/>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-            <input id="emp-estado" type="text" placeholder="UF" maxlength="2" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"/>
+            <label class="block text-sm font-medium mb-1" style="color:#c9a96e">Estado</label>
+            <input id="emp-estado" type="text" placeholder="UF" maxlength="2" class="w-full px-3 py-2 text-sm"/>
           </div>
         </div>
 
@@ -566,11 +566,11 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
           <h5 class="font-semibold text-gray-700 mb-3 flex items-center gap-2"><i class="fas fa-truck text-violet-500"></i> Opções de envio dos Correios</h5>
           <div id="frete-opcoes" class="space-y-3"></div>
         </div>
-        <div id="frete-loading" class="hidden mt-5 flex items-center gap-3 text-gray-500 text-sm"><div class="loading-spinner"></div> Calculando frete...</div>
+        <div id="frete-loading" class="hidden mt-5 flex items-center gap-3 text-sm" style="color:#7a6040"><div class="loading-spinner"></div> Calculando frete...</div>
 
         <div class="flex justify-between mt-6">
-          <button onclick="showStep(1)" class="px-5 py-2 border border-gray-200 text-gray-600 rounded-lg text-sm hover:bg-gray-50 flex items-center gap-2"><i class="fas fa-arrow-left"></i> Voltar</button>
-          <button onclick="empStep3()" id="btn-emp-step3" disabled class="px-6 py-2 bg-violet-600 hover:bg-violet-700 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium flex items-center gap-2">Gerar Boleto <i class="fas fa-barcode"></i></button>
+          <button onclick="showStep(1)" class="px-5 py-2 text-sm flex items-center gap-2" style="border:1px solid #5c3d1a;color:#c9a96e;border-radius:3px"><i class="fas fa-arrow-left"></i> Voltar</button>
+          <button onclick="empStep3()" id="btn-emp-step3" disabled class="px-6 py-2 btn-primary disabled:opacity-40 disabled:cursor-not-allowed text-sm font-medium flex items-center gap-2" style="border-radius:3px">Gerar Boleto <i class="fas fa-barcode"></i></button>
         </div>
       </div>
 
@@ -585,7 +585,7 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
 
 <!-- Modal detalhe empréstimo (admin) -->
 <div id="modal-emp-detalhe" class="modal-overlay fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-  <div class="modal-box bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+  <div class="modal-box w-full max-w-lg max-h-[90vh] overflow-y-auto">
     <div id="emp-detalhe-content" class="p-6"></div>
   </div>
 </div>
@@ -725,7 +725,7 @@ function showToast(msg, type='success') {
   const colors={success:'bg-green-600',error:'bg-red-600',info:'bg-blue-600',warning:'bg-amber-500'};
   const icons={success:'fa-check-circle',error:'fa-exclamation-circle',info:'fa-info-circle',warning:'fa-exclamation-triangle'};
   const el=document.createElement('div');
-  el.className=\`toast flex items-center gap-3 \${colors[type]} text-white px-4 py-3 rounded-xl shadow-lg text-sm font-medium min-w-64\`;
+  el.className=\`toast flex items-center gap-3 \${colors[type]} text-white px-4 py-3 text-sm font-medium min-w-64" style="border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.5)\`;
   el.innerHTML=\`<i class="fas \${icons[type]}"></i><span>\${msg}</span>\`;
   document.getElementById('toast-container').appendChild(el);
   setTimeout(()=>el.remove(),3100);
@@ -838,7 +838,7 @@ function setView(view){
     document.getElementById('view-'+v).classList.toggle('hidden',v!==view);
     const nav=document.getElementById('nav-'+v);
     if(v===view){nav.classList.add('active');nav.classList.remove('text-gray-600','hover:bg-gray-50');}
-    else{nav.classList.remove('active');nav.classList.add('text-gray-600','hover:bg-gray-50');}
+    else{nav.classList.remove('active');}
   });
   if(view==='livros')loadLivros();
   if(view==='emprestimos')loadEmprestimos();
@@ -850,8 +850,8 @@ function setView(view){
 // ─── LAYOUT ─────────────────────────────────────────
 function setLayout(mode){
   currentLayout=mode;
-  document.getElementById('btn-grid').className=mode==='grid'?'p-2 rounded-lg text-violet-600 bg-violet-50':'p-2 rounded-lg text-gray-400 hover:text-gray-600';
-  document.getElementById('btn-list').className=mode==='list'?'p-2 rounded-lg text-violet-600 bg-violet-50':'p-2 rounded-lg text-gray-400 hover:text-gray-600';
+  document.getElementById('btn-grid').style.cssText=mode==='grid'?'color:#c9882a;background:rgba(201,136,42,.15);border:1px solid #5c3d1a;padding:6px 10px;border-radius:3px':'color:#7a6040;background:transparent;border:1px solid #3a2509;padding:6px 10px;border-radius:3px';
+  document.getElementById('btn-list').style.cssText=mode==='list'?'color:#c9882a;background:rgba(201,136,42,.15);border:1px solid #5c3d1a;padding:6px 10px;border-radius:3px':'color:#7a6040;background:transparent;border:1px solid #3a2509;padding:6px 10px;border-radius:3px';
   renderLivros(allLivros);
 }
 
@@ -874,7 +874,7 @@ async function loadLivros(){
 
 function coverPlaceholder(t,big=true){
   const l=(t||'L')[0].toUpperCase();
-  return \`<div class="cover-placeholder w-full h-full flex items-center justify-center \${big?'':'rounded-lg'}"><span class="font-serif \${big?'text-5xl':'text-lg'} text-white/80 font-bold">\${l}</span></div>\`;
+  return \`<div class="cover-placeholder w-full h-full flex items-center justify-center \${big?'':''} style='border-radius:3px'"><span class="font-serif \${big?'text-5xl':'text-lg'} text-white/80 font-bold">\${l}</span></div>\`;
 }
 
 function renderLivros(livros){
@@ -1011,7 +1011,7 @@ async function solicitarEmprestimo(livroId){
   try{
     const{data:l}=await axios.get('/api/livros/'+livroId);
     document.getElementById('emp-livro-info').innerHTML=\`
-      <div class="w-14 h-20 rounded-lg overflow-hidden flex-shrink-0 shadow">\${l.capa_url?\`<img src="\${l.capa_url}" class="w-full h-full object-cover" onerror="this.outerHTML=coverPlaceholder('\${l.titulo.replace(/'/g,'')}',false)">\`:coverPlaceholder(l.titulo,false)}</div>
+      <div class="w-14 h-20 overflow-hidden flex-shrink-0" style="border-radius:3px;border:1px solid #3a2509">\${l.capa_url?\`<img src="\${l.capa_url}" class="w-full h-full object-cover" onerror="this.outerHTML=coverPlaceholder('\${l.titulo.replace(/'/g,'')}',false)">\`:coverPlaceholder(l.titulo,false)}</div>
       <div class="flex-1 min-w-0">
         <p class="da-section-title mb-1">Livro selecionado</p>
         <h4 class="font-serif font-bold leading-snug" style="color:#f0c060">\${l.titulo}</h4>
@@ -1033,7 +1033,7 @@ function showStep(n){
     else ind.classList.add('step-pending');
     // atualiza textos de cor
     const span=ind.querySelector('span');
-    if(span){span.className=span.className.replace(/text-(violet|green|gray)-\d+/g,'');span.classList.add(i<n?'text-green-600':i===n?'text-violet-600':'text-gray-400');}
+    if(span){span.className=span.className.replace(/text-(violet|green|gray)-\d+/g,'');span.classList.add(i<n?'text-green-600':i===n?'text-amber-500':'text-gray-600');}
   });
   [1,2].forEach(i=>{
     const line=document.getElementById('step-line-'+i);
@@ -1054,7 +1054,7 @@ async function buscarCEP(cep){
   if(!cep) cep=document.getElementById('emp-cep').value.replace(/\D/g,'');
   if(cep.length!==8) return;
   const st=document.getElementById('cep-status');
-  st.textContent='Buscando...';st.className='text-xs mt-1 text-gray-400 animate-pulse2';
+  st.textContent='Buscando...';st.className='text-xs mt-1 animate-pulse2' + ';color:#7a6040';
   try{
     const{data}=await axios.get('/api/cep/'+cep);
     if(data.erro){st.textContent='CEP não encontrado';st.className='text-xs mt-1 text-red-500';return;}
@@ -1079,17 +1079,17 @@ async function calcularFrete(cep){
     document.getElementById('frete-area').classList.remove('hidden');
     const container=document.getElementById('frete-opcoes');
     container.innerHTML=data.opcoes.map((op,i)=>\`
-      <label class="flex items-center gap-4 border-2 border-gray-200 hover:border-violet-300 rounded-xl p-4 cursor-pointer transition-all has-[:checked]:border-violet-500 has-[:checked]:bg-violet-50">
-        <input type="radio" name="frete" value="\${i}" onchange="selectFrete(\${i},\${op.preco})" class="accent-violet-600"/>
+      <label class="flex items-center gap-4 p-4 cursor-pointer transition-all" style="border:1px solid #5c3d1a;border-radius:3px;background:#1f1508" onmouseover="this.style.borderColor='#c9882a'" onmouseout="if(!this.querySelector('input').checked)this.style.borderColor='#5c3d1a'"">
+        <input type="radio" name="frete" style="accent-color:#c9882a" value="\${i}" onchange="selectFrete(\${i},\${op.preco})"/>
         <div class="flex-1">
           <div class="flex items-center gap-2">
-            <span class="font-semibold text-gray-800">\${op.nome}</span>
-            <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">\${op.codigo}</span>
+            <span class="font-semibold" style="color:#e8d5b0">\${op.nome}</span>
+            <span class="text-xs px-2 py-0.5" style="background:#3a2509;color:#c9882a;border-radius:2px">\${op.codigo}</span>
           </div>
-          <p class="text-xs text-gray-500 mt-0.5">\${op.prazo}</p>
+          <p class="text-xs mt-0.5" style="color:#7a6040">\${op.prazo}</p>
         </div>
         <div class="text-right flex-shrink-0">
-          <p class="font-bold text-violet-700 text-lg">\${fmtMoeda(op.preco)}</p>
+          <p class="font-bold text-lg" style="color:#c9882a">\${fmtMoeda(op.preco)}</p>
         </div>
       </label>\`).join('');
   }catch(e){
@@ -1163,20 +1163,20 @@ async function renderPIX(emp){
       <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
         <i class="fas fa-check text-green-600 text-2xl"></i>
       </div>
-      <h4 class="font-serif text-xl font-bold text-gray-800">Empréstimo solicitado!</h4>
-      <p class="text-sm text-gray-500 mt-1">Realize o pagamento via PIX para confirmar o envio</p>
+      <h4 class="font-serif text-xl font-bold" style="color:#f0c060">Empréstimo solicitado!</h4>
+      <p class="text-sm mt-1" style="color:#7a6040">Realize o pagamento via PIX para confirmar o envio</p>
     </div>
 
     \${semPix?\`
-      <div class="bg-red-50 border border-red-200 rounded-xl p-5 text-center">
-        <i class="fas fa-exclamation-triangle text-red-400 text-2xl mb-2"></i>
-        <p class="text-red-700 font-semibold text-sm">Chave PIX não configurada</p>
-        <p class="text-red-500 text-xs mt-1">O administrador precisa cadastrar a chave PIX em Configurações antes de receber pagamentos.</p>
+      <div style="background:#3a0a0a;border:1px solid #8b2a2a;border-radius:3px" class="p-5 text-center">
+        <i class="fas fa-exclamation-triangle text-2xl mb-2" style="color:#e05555"></i>
+        <p class="font-semibold text-sm" style="color:#e05555">Chave PIX não configurada</p>
+        <p class="text-xs mt-1" style="color:#c47777">O administrador precisa cadastrar a chave PIX em Configurações antes de receber pagamentos.</p>
       </div>
     \`:\`
       <!-- Comprovante de solicitação -->
-      <div class="border-2 border-gray-200 rounded-xl overflow-hidden mb-4">
-        <div class="bg-gray-800 text-white px-5 py-3 flex items-center justify-between">
+      <div style="border:2px solid #5c3d1a;border-radius:3px;overflow:hidden" class="mb-4">
+        <div class="text-white px-5 py-3 flex items-center justify-between" style="background:#1a0f05">
           <div class="flex items-center gap-3">
             <i class="fas fa-book-open text-xl"></i>
             <div><p class="font-bold text-sm">\${nomeBib}</p><p class="text-xs text-gray-300">Comprovante de Solicitação</p></div>
@@ -1186,22 +1186,22 @@ async function renderPIX(emp){
             <p class="font-bold text-amber-300">#\${String(emp.id).padStart(6,'0')}</p>
           </div>
         </div>
-        <div class="bg-white px-5 py-4 grid grid-cols-2 gap-3 text-xs border-b border-dashed border-gray-200">
-          <div><p class="text-gray-400 mb-0.5">Solicitante</p><p class="font-semibold text-gray-800">\${emp.solicitante_nome}</p></div>
-          <div><p class="text-gray-400 mb-0.5">CPF</p><p class="font-semibold text-gray-800">\${emp.solicitante_cpf}</p></div>
-          <div class="col-span-2"><p class="text-gray-400 mb-0.5">Livro</p><p class="font-semibold text-gray-800">\${emp.livro_titulo}</p></div>
-          <div><p class="text-gray-400 mb-0.5">Modalidade de Frete</p><p class="font-semibold text-gray-800">\${emp.frete_modalidade}</p></div>
-          <div><p class="text-gray-400 mb-0.5">Prazo do Empréstimo</p><p class="font-semibold text-gray-800">\${emp.prazo_dias} dias</p></div>
+        <div class="px-5 py-4 grid grid-cols-2 gap-3 text-xs" style="background:#1f1508;border-bottom:1px dashed #5c3d1a">
+          <div><p class="text-gray-400 mb-0.5">Solicitante</p><p class="font-semibold" style="color:#e8d5b0">\${emp.solicitante_nome}</p></div>
+          <div><p class="text-gray-400 mb-0.5">CPF</p><p class="font-semibold" style="color:#e8d5b0">\${emp.solicitante_cpf}</p></div>
+          <div class="col-span-2"><p class="text-gray-400 mb-0.5">Livro</p><p class="font-semibold" style="color:#e8d5b0">\${emp.livro_titulo}</p></div>
+          <div><p class="text-gray-400 mb-0.5">Modalidade de Frete</p><p class="font-semibold" style="color:#e8d5b0">\${emp.frete_modalidade}</p></div>
+          <div><p class="text-gray-400 mb-0.5">Prazo do Empréstimo</p><p class="font-semibold" style="color:#e8d5b0">\${emp.prazo_dias} dias</p></div>
         </div>
-        <div class="bg-violet-50 px-5 py-3 flex items-center justify-between">
-          <p class="text-sm text-gray-600 font-medium">Valor a pagar (frete)</p>
-          <p class="font-bold text-2xl text-violet-700">\${fmtMoeda(emp.frete_valor)}</p>
+        <div class="px-5 py-3 flex items-center justify-between" style="background:#2a1a05">
+          <p class="text-sm font-medium" style="color:#c9a96e">Valor a pagar (frete)</p>
+          <p class="font-bold text-2xl" style="color:#c9882a">${fmtMoeda(emp.frete_valor)}</p>
         </div>
       </div>
 
       <!-- Área PIX -->
-      <div class="bg-green-50 border-2 border-green-300 rounded-xl overflow-hidden">
-        <div class="bg-green-600 text-white px-5 py-3 flex items-center gap-3">
+      <div style="border:2px solid #2a5c2a;border-radius:3px;overflow:hidden">
+        <div class="text-white px-5 py-3 flex items-center gap-3" style="background:#1a3d1a">
           <i class="fas fa-qrcode text-xl"></i>
           <div>
             <p class="font-bold text-sm">Pagar via PIX</p>
@@ -1211,27 +1211,27 @@ async function renderPIX(emp){
         <div class="p-5">
           <div class="flex flex-col sm:flex-row items-center gap-5">
             <!-- Ícone QR -->
-            <div class="flex-shrink-0 w-28 h-28 bg-white border-2 border-green-300 rounded-xl flex flex-col items-center justify-center shadow-sm">
-              <i class="fas fa-qrcode text-green-600 text-4xl mb-1"></i>
-              <p class="text-xs text-green-600 font-semibold">PIX</p>
+            <div class="flex-shrink-0 w-28 h-28 border-2 flex flex-col items-center justify-center shadow-sm" style="background:#1f2a1f;border-color:#2a5c2a;border-radius:3px">
+              <i class="fas fa-qrcode text-4xl mb-1" style="color:#5a9e5a"></i>
+              <p class="text-xs font-semibold" style="color:#5a9e5a">PIX</p>
             </div>
             <!-- Dados -->
             <div class="flex-1 w-full space-y-3">
               \${tipoLabel?\`<div class="flex items-center gap-2 text-xs text-gray-500"><i class="fas fa-tag w-4"></i><span>Tipo: <strong>\${tipoLabel}</strong></span></div>\`:''}
               \${pixTitular?\`<div class="flex items-center gap-2 text-xs text-gray-500"><i class="fas fa-user w-4"></i><span>\${pixTitular}</span></div>\`:''}
               \${pixBanco?\`<div class="flex items-center gap-2 text-xs text-gray-500"><i class="fas fa-university w-4"></i><span>\${pixBanco}</span></div>\`:''}
-              <div class="bg-white border border-green-200 rounded-lg p-3">
+              <div style="background:#1f2a1f;border:1px solid #2a5c2a;border-radius:3px" class="p-3">
                 <p class="text-xs text-gray-400 mb-1">Chave PIX</p>
                 <div class="flex items-center gap-2">
-                  <p id="pix-chave-display" class="font-mono text-sm font-bold text-gray-800 flex-1 break-all">\${pixChave}</p>
+                  <p id="pix-chave-display" class="font-mono text-sm font-bold flex-1 break-all" style="color:#e8d5b0">\${pixChave}</p>
                   <button onclick="copiarPIX('\${pixChave}')" class="flex-shrink-0 px-3 py-1.5 bg-green-600 text-white text-xs rounded-lg hover:bg-green-700 flex items-center gap-1 transition-colors">
                     <i class="fas fa-copy"></i> Copiar
                   </button>
                 </div>
               </div>
-              <div class="bg-white border border-green-200 rounded-lg p-3">
+              <div style="background:#1f2a1f;border:1px solid #2a5c2a;border-radius:3px" class="p-3">
                 <p class="text-xs text-gray-400 mb-1">Valor exato a transferir</p>
-                <p class="font-bold text-xl text-green-700">\${fmtMoeda(emp.frete_valor)}</p>
+                <p class="font-bold text-xl" style="color:#5a9e5a">\${fmtMoeda(emp.frete_valor)}</p>
               </div>
             </div>
           </div>
@@ -1239,9 +1239,9 @@ async function renderPIX(emp){
       </div>
 
       <!-- Instruções -->
-      <div class="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-4">
-        <p class="font-semibold text-amber-800 text-sm mb-2"><i class="fas fa-info-circle mr-2"></i>Como pagar</p>
-        <ol class="space-y-1.5 text-amber-700 text-xs list-decimal list-inside">
+      <div class="mt-4 p-4" style="background:#1f1a05;border:1px solid #5c4a1a;border-radius:3px">
+        <p class="font-semibold text-sm mb-2" style="color:#c9882a"><i class="fas fa-info-circle mr-2"></i>Como pagar</p>
+        <ol class="space-y-1.5 text-xs list-decimal list-inside" style="color:#c9a96e">
           <li>Abra o app do seu banco e acesse a área <strong>PIX</strong></li>
           <li>Escolha <strong>Pagar com chave PIX</strong> e cole a chave acima</li>
           <li>Confirme o valor de <strong>\${fmtMoeda(emp.frete_valor)}</strong> e finalize o pagamento</li>
@@ -1252,10 +1252,10 @@ async function renderPIX(emp){
     \`}
 
     <div class="mt-4 flex gap-3">
-      <button onclick="window.print()" class="flex-1 border border-gray-200 text-gray-600 rounded-lg py-2 text-sm hover:bg-gray-50 flex items-center justify-center gap-2">
+      <button onclick="window.print()" class="flex-1 py-2 text-sm flex items-center justify-center gap-2" style="border:1px solid #5c3d1a;color:#c9a96e;border-radius:3px">
         <i class="fas fa-print"></i> Imprimir
       </button>
-      <button onclick="closeModal('modal-emprestimo');setView('emprestimos')" class="flex-1 bg-violet-600 text-white rounded-lg py-2 text-sm font-medium hover:bg-violet-700 flex items-center justify-center gap-2">
+      <button onclick="closeModal('modal-emprestimo');setView('emprestimos')" class="btn-primary flex-1 py-2 text-sm font-medium flex items-center justify-center gap-2">
         <i class="fas fa-list"></i> Ver Empréstimos
       </button>
     </div>
@@ -1295,40 +1295,40 @@ function updateBadgeEmprestimos(n){
 function filterEmprestimos(status){
   empFilterStatus=status;
   document.querySelectorAll('.emp-filter-btn').forEach(btn=>{
-    btn.className='emp-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200';
+    btn.className='emp-filter-btn px-3 py-1.5 text-xs font-semibold';btn.style.cssText='border-radius:3px;background:#1a1209;border:1px solid #3a2509;color:#c9a96e';
   });
   const activeId='ef-'+(status||'todos');
   const activeBtn=document.getElementById(activeId);
-  if(activeBtn)activeBtn.className='emp-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-violet-600 text-white';
+  if(activeBtn){activeBtn.className='emp-filter-btn px-3 py-1.5 text-xs font-semibold';activeBtn.style.cssText='border-radius:3px;background:#c9882a;border:1px solid #c9882a;color:#1a0f05;font-weight:700';}
   loadEmprestimos();
 }
 
 function renderEmprestimos(lista){
   const c=document.getElementById('emprestimos-container');
   if(!lista.length){
-    c.innerHTML=\`<div class="flex flex-col items-center justify-center py-20 text-gray-400 bg-white rounded-xl border border-gray-200"><i class="fas fa-handshake text-5xl mb-4 opacity-30"></i><p class="text-lg font-medium">Nenhum empréstimo encontrado</p></div>\`;
+    c.innerHTML=\`<div class="flex flex-col items-center justify-center py-20" style="color:#7a6040;background:#150e04;border:1px solid #3a2509;border-radius:3px"><i class="fas fa-handshake text-5xl mb-4 opacity-30"></i><p class="text-lg font-medium">Nenhum empréstimo encontrado</p></div>\`;
     return;
   }
   c.innerHTML=lista.map(e=>\`
-    <div class="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition-shadow">
+    <div class="p-5 hover:shadow-md transition-shadow" style="background:#1a1209;border:1px solid #3a2509;border-radius:3px">
       <div class="flex items-start gap-4 flex-wrap">
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-2 flex-wrap mb-1">
             <span class="font-mono text-xs text-gray-400">#\${String(e.id).padStart(6,'0')}</span>
             \${empStatusBadge(e.status)}
           </div>
-          <h3 class="font-serif font-bold text-gray-900">\${e.livro_titulo||'—'}</h3>
+          <h3 class="font-serif font-bold" style="color:#e8d5b0">\${e.livro_titulo||'—'}</h3>
           <p class="text-sm text-gray-500 mt-0.5">\${e.solicitante_nome} · \${e.solicitante_email}</p>
           <p class="text-xs text-gray-400 mt-1"><i class="fas fa-map-marker-alt mr-1"></i>\${e.endereco_logradouro}, \${e.endereco_numero} — \${e.endereco_cidade}/\${e.endereco_estado} · CEP \${e.endereco_cep}</p>
         </div>
         <div class="text-right flex-shrink-0">
-          <p class="font-bold text-violet-700 text-xl">\${fmtMoeda(e.frete_valor)}</p>
+          <p class="font-bold text-xl" style="color:#c9882a">\${fmtMoeda(e.frete_valor)}</p>
           <p class="text-xs text-gray-400">\${e.frete_modalidade||''}</p>
           <p class="text-xs text-gray-400 mt-1">\${fmtData(e.created_at)}</p>
         </div>
       </div>
 
-      <div class="mt-4 pt-4 border-t border-gray-100 flex flex-wrap gap-2 items-center justify-between">
+      <div class="mt-4 pt-4 flex flex-wrap gap-2 items-center justify-between" style="border-top:1px solid #3a2509">
         <div class="flex flex-wrap gap-2">
           \${e.status==='aguardando_pagamento'?\`
             <button onclick="confirmarPagamento(\${e.id})" class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1"><i class="fas fa-check"></i> Confirmar Pagamento</button>
@@ -1341,7 +1341,7 @@ function renderEmprestimos(lista){
             <button onclick="marcarEntregue(\${e.id})" class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1"><i class="fas fa-box-open"></i> Confirmar Entrega</button>
           \`:''}
         </div>
-        <button onclick="verDetalheEmprestimo(\${e.id})" class="px-3 py-1.5 border border-gray-200 text-gray-600 rounded-lg text-xs hover:bg-gray-50 flex items-center gap-1"><i class="fas fa-eye"></i> Detalhes</button>
+        <button onclick="verDetalheEmprestimo(\${e.id})" class="px-3 py-1.5 text-xs flex items-center gap-1" style="border:1px solid #5c3d1a;color:#c9a96e;border-radius:3px"><i class="fas fa-eye"></i> Detalhes</button>
       </div>
     </div>\`).join('');
 }
@@ -1377,25 +1377,25 @@ async function verDetalheEmprestimo(id){
       <div class="flex items-start justify-between mb-5">
         <div>
           <p class="text-xs text-gray-400 font-mono">#\${String(e.id).padStart(6,'0')}</p>
-          <h3 class="font-serif text-xl font-bold text-gray-800">\${e.livro_titulo}</h3>
+          <h3 class="font-serif text-xl font-bold" style="color:#f0c060">\${e.livro_titulo}</h3>
         </div>
         <button onclick="closeModal('modal-emp-detalhe')" class="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100"><i class="fas fa-times"></i></button>
       </div>
       \${empStatusBadge(e.status)}
       <div class="mt-4 space-y-3 text-sm">
         <div class="grid grid-cols-2 gap-3">
-          <div class="bg-gray-50 rounded-lg p-3"><p class="text-xs text-gray-400 mb-0.5">Solicitante</p><p class="font-medium">\${e.solicitante_nome}</p></div>
-          <div class="bg-gray-50 rounded-lg p-3"><p class="text-xs text-gray-400 mb-0.5">CPF</p><p class="font-medium">\${e.solicitante_cpf}</p></div>
-          <div class="bg-gray-50 rounded-lg p-3"><p class="text-xs text-gray-400 mb-0.5">E-mail</p><p class="font-medium text-xs">\${e.solicitante_email}</p></div>
-          <div class="bg-gray-50 rounded-lg p-3"><p class="text-xs text-gray-400 mb-0.5">Telefone</p><p class="font-medium">\${e.solicitante_telefone||'—'}</p></div>
+          <div style="background:#1f1508;border-radius:3px" class="p-3"><p class="text-xs mb-0.5" style="color:#5a4020">Solicitante</p><p class="font-medium" style="color:#e8d5b0">\${e.solicitante_nome}</p></div>
+          <div style="background:#1f1508;border-radius:3px" class="p-3"><p class="text-xs mb-0.5" style="color:#5a4020">CPF</p><p class="font-medium" style="color:#e8d5b0">\${e.solicitante_cpf}</p></div>
+          <div style="background:#1f1508;border-radius:3px" class="p-3"><p class="text-xs mb-0.5" style="color:#5a4020">E-mail</p><p class="font-medium text-xs" style="color:#e8d5b0">\${e.solicitante_email}</p></div>
+          <div style="background:#1f1508;border-radius:3px" class="p-3"><p class="text-xs mb-0.5" style="color:#5a4020">Telefone</p><p class="font-medium" style="color:#e8d5b0">\${e.solicitante_telefone||'—'}</p></div>
         </div>
-        <div class="bg-gray-50 rounded-lg p-3"><p class="text-xs text-gray-400 mb-1">Endereço de entrega</p><p class="font-medium">\${e.endereco_logradouro}, \${e.endereco_numero}\${e.endereco_complemento?', '+e.endereco_complemento:''}</p><p class="text-xs text-gray-500">\${e.endereco_bairro?e.endereco_bairro+' — ':''}\${e.endereco_cidade}/\${e.endereco_estado} — CEP \${e.endereco_cep}</p></div>
+        <div style="background:#1f1508;border-radius:3px" class="p-3"><p class="text-xs mb-1" style="color:#5a4020">Endereço de entrega</p><p class="font-medium" style="color:#e8d5b0">\${e.endereco_logradouro}, \${e.endereco_numero}\${e.endereco_complemento?', '+e.endereco_complemento:''}</p><p class="text-xs" style="color:#7a6040">\${e.endereco_bairro?e.endereco_bairro+' — ':''}\${e.endereco_cidade}/\${e.endereco_estado} — CEP \${e.endereco_cep}</p></div>
         <div class="grid grid-cols-2 gap-3">
-          <div class="bg-violet-50 rounded-lg p-3"><p class="text-xs text-violet-400 mb-0.5">Frete</p><p class="font-bold text-violet-700">\${fmtMoeda(e.frete_valor)}</p><p class="text-xs text-violet-500">\${e.frete_modalidade}</p></div>
-          <div class="bg-gray-50 rounded-lg p-3"><p class="text-xs text-gray-400 mb-0.5">Prazo devolução</p><p class="font-medium">\${e.prazo_dias} dias</p></div>
+          <div style="background:#2a1a05;border-radius:3px" class="p-3"><p class="text-xs mb-0.5" style="color:#5a4020">Frete</p><p class="font-bold" style="color:#c9882a">\${fmtMoeda(e.frete_valor)}</p><p class="text-xs" style="color:#7a6040">\${e.frete_modalidade}</p></div>
+          <div style="background:#1f1508;border-radius:3px" class="p-3"><p class="text-xs mb-0.5" style="color:#5a4020">Prazo devolução</p><p class="font-medium" style="color:#e8d5b0">\${e.prazo_dias} dias</p></div>
         </div>
         \${e.codigo_rastreamento?\`<div class="bg-indigo-50 rounded-lg p-3"><p class="text-xs text-indigo-400 mb-0.5">Rastreamento</p><p class="font-mono font-bold text-indigo-700">\${e.codigo_rastreamento}</p></div>\`:''}
-        <div class="bg-green-50 rounded-lg p-3"><p class="text-xs text-green-600 mb-0.5">Pagamento via PIX</p><p class="text-xs text-green-700">Confirme o recebimento na sua conta bancária antes de marcar como pago.</p></div>
+        <div style="background:#1a2a1a;border-radius:3px" class="p-3"><p class="text-xs mb-0.5" style="color:#5a9e5a">Pagamento via PIX</p><p class="text-xs" style="color:#7a9e7a">Confirme o recebimento na sua conta bancária antes de marcar como pago.</p></div>
         <p class="text-xs text-gray-400 text-right">Solicitado em \${fmtData(e.created_at)}</p>
       </div>
     \`;
@@ -1412,13 +1412,13 @@ async function loadAutores(selectOnly=false){
     if(el){const v=el.value;el.innerHTML='<option value="">Selecionar autor</option>'+autores.map(a=>\`<option value="\${a.id}">\${a.nome}</option>\`).join('');el.value=v;}
     if(selectOnly)return;
     const c=document.getElementById('autores-container');
-    if(!autores.length){c.innerHTML=\`<div class="col-span-full text-center py-16 text-gray-400"><i class="fas fa-user-pen text-4xl mb-3 opacity-30"></i><p>Nenhum autor cadastrado</p></div>\`;return;}
+    if(!autores.length){c.innerHTML=\`<div class="col-span-full text-center py-16" style="color:#7a6040"><i class="fas fa-user-pen text-4xl mb-3 opacity-30"></i><p>Nenhum autor cadastrado</p></div>\`;return;}
     c.innerHTML=autores.map(a=>\`
-      <div class="bg-white rounded-xl border border-gray-200 p-5 flex items-center gap-4">
-        <div class="w-12 h-12 bg-violet-100 rounded-full flex items-center justify-center flex-shrink-0"><span class="font-serif text-violet-600 text-xl font-bold">\${a.nome[0]}</span></div>
-        <div class="flex-1 min-w-0"><h3 class="font-semibold text-gray-800 truncate">\${a.nome}</h3><p class="text-sm text-gray-400">\${a.nacionalidade||'Não informada'}</p><p class="text-xs text-violet-500 mt-0.5">\${a.total_livros||0} livro(s)</p></div>
+      <div class="p-5 flex items-center gap-4" style="background:#1a1209;border:1px solid #3a2509;border-radius:3px">
+        <div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style="background:#3a2509"><span class="font-serif text-xl font-bold" style="color:#c9882a">\${a.nome[0]}</span></div>
+        <div class="flex-1 min-w-0"><h3 class="font-semibold" class="font-semibold truncate" style="color:#e8d5b0">\${a.nome}</h3><p class="text-sm" style="color:#7a6040">\${a.nacionalidade||'Não informada'}</p><p class="text-xs mt-0.5" style="color:#c9882a">\${a.total_livros||0} livro(s)</p></div>
         <div class="flex gap-1">
-          \${currentUser?\`<button onclick="editAutor(\${a.id})" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-violet-600 hover:bg-violet-50"><i class="fas fa-edit text-xs"></i></button><button onclick="deleteAutor(\${a.id},'\${a.nome.replace(/'/g,'')}')" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50"><i class="fas fa-trash text-xs"></i></button>\`:''}
+          \${currentUser?\`<button onclick="editAutor(\${a.id})" class="w-8 h-8 flex items-center justify-center" style="border-radius:3px;color:#7a6040"><i class="fas fa-edit text-xs"></i></button><button onclick="deleteAutor(\${a.id},'\${a.nome.replace(/'/g,'')}')" class="w-8 h-8 flex items-center justify-center" style="border-radius:3px;color:#7a6040"><i class="fas fa-trash text-xs"></i></button>\`:''}
         </div>
       </div>\`).join('');
   }catch(e){showToast('Erro ao carregar autores','error')}
@@ -1448,14 +1448,14 @@ async function loadCategorias(selectOnly=false){
     ['filter-categoria','livro-categoria'].forEach(id=>{const el=document.getElementById(id);if(!el)return;const v=el.value;const prefix=id==='filter-categoria'?'<option value="">Todas as categorias</option>':'<option value="">Selecionar categoria</option>';el.innerHTML=prefix+cats.map(c=>\`<option value="\${c.id}">\${c.nome}</option>\`).join('');el.value=v;});
     if(selectOnly)return;
     const container=document.getElementById('categorias-container');
-    const colors=['bg-violet-50 text-violet-700','bg-blue-50 text-blue-700','bg-green-50 text-green-700','bg-amber-50 text-amber-700','bg-red-50 text-red-700','bg-pink-50 text-pink-700'];
-    if(!cats.length){container.innerHTML=\`<div class="col-span-full text-center py-16 text-gray-400"><i class="fas fa-tags text-4xl mb-3 opacity-30"></i><p>Nenhuma categoria</p></div>\`;return;}
+    const colors=[['#3a2509','#c9882a'],['#0a1a3a','#6a9ed0'],['#0a2a1a','#5a9e5a'],['#2a1a05','#c9a96e'],['#3a0a0a','#c96060'],['#2a0a2a','#c060c0']];
+    if(!cats.length){container.innerHTML=\`<div class="col-span-full text-center py-16" style="color:#7a6040"><i class="fas fa-tags text-4xl mb-3 opacity-30"></i><p>Nenhuma categoria</p></div>\`;return;}
     container.innerHTML=cats.map((c,i)=>\`
-      <div class="bg-white rounded-xl border border-gray-200 p-5">
+      <div class="p-5" style="background:#1a1209;border:1px solid #3a2509;border-radius:3px">
         <div class="flex items-center justify-between mb-3">
           <span class="text-xs font-bold px-2.5 py-1 rounded-full \${colors[i%colors.length]}">\${c.nome}</span>
           <div class="flex gap-1">
-            \${currentUser?\`<button onclick="editCategoria(\${c.id})" class="w-7 h-7 flex items-center justify-center rounded-lg text-gray-400 hover:text-violet-600 hover:bg-violet-50"><i class="fas fa-edit text-xs"></i></button><button onclick="deleteCategoria(\${c.id},'\${c.nome.replace(/'/g,'')}')" class="w-7 h-7 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50"><i class="fas fa-trash text-xs"></i></button>\`:''}
+            \${currentUser?\`<button onclick="editCategoria(\${c.id})" class="w-7 h-7 flex items-center justify-center" style="border-radius:3px;color:#7a6040"><i class="fas fa-edit text-xs"></i></button><button onclick="deleteCategoria(\${c.id},'\${c.nome.replace(/'/g,'')}')" class="w-7 h-7 flex items-center justify-center" style="border-radius:3px;color:#7a6040"><i class="fas fa-trash text-xs"></i></button>\`:''}
           </div>
         </div>
         <p class="text-sm text-gray-500">\${c.descricao||'Sem descrição'}</p>
