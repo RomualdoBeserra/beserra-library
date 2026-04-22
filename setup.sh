@@ -335,63 +335,57 @@ npm install --legacy-peer-deps
 log "Dependências instaladas"
 
 # ── CORREÇÃO BUS ERROR ──────────────────────────────────────────────────────
-# O Bus error NÃO é causado pelo Node.js (NODE_OPTIONS não resolve).
-# A causa real é o binário nativo do esbuild (ELF/Go) — o kernel da VM não
-# consegue mapeá-lo em memória quando RAM < 1GB → SIGBUS no processo filho.
+# Causa: o binário nativo do esbuild (ELF/Go estaticamente linkado) causa
+# SIGBUS em VMs GCP com < 1GB RAM pois o kernel falha no mmap do executável.
 #
-# Solução: substituir o binário nativo do esbuild pela versão WASM (JS puro),
-# que roda inteiramente dentro do Node.js sem precisar de mmap de binários ELF.
+# Solução CORRETA: substituir APENAS o binário ELF nativo por um script Node.js
+# que chama o esbuild-wasm (WebAssembly puro, sem binário nativo).
+# NÃO alterar main.js do esbuild — isso quebra a API usada pelo Vite/plugins.
 # ────────────────────────────────────────────────────────────────────────────
-info "Substituindo esbuild nativo por versão WASM (evita Bus error em VMs com pouca RAM)..."
+info "Corrigindo esbuild para evitar Bus error em VMs com pouca RAM..."
 
 ESBUILD_VERSION=$(node -e "console.log(require('./node_modules/esbuild/package.json').version)" 2>/dev/null || echo "")
 if [ -z "$ESBUILD_VERSION" ]; then
   warn "Não foi possível detectar versão do esbuild — usando fallback 0.25.0"
   ESBUILD_VERSION="0.25.0"
 fi
-info "Versão esbuild detectada: ${ESBUILD_VERSION}"
+info "Versão esbuild: ${ESBUILD_VERSION}"
 
-# Instala esbuild-wasm na mesma versão do esbuild atual
+# Instala esbuild-wasm na mesma versão
 npm install --save-dev "esbuild-wasm@${ESBUILD_VERSION}" --legacy-peer-deps 2>/dev/null \
-  || npm install --save-dev esbuild-wasm --legacy-peer-deps
+  || npm install --save-dev esbuild-wasm --legacy-peer-deps 2>/dev/null \
+  || warn "Não foi possível instalar esbuild-wasm"
 
-# Substitui o binário nativo pelo wrapper WASM
-ESBUILD_BIN="$APP_DIR/node_modules/.bin/esbuild"
+# Localiza o binário nativo do esbuild (é o que recebe SIGBUS)
+ESBUILD_NATIVE="$APP_DIR/node_modules/@esbuild/linux-x64/bin/esbuild"
+# Fallback para localização alternativa
+[ ! -f "$ESBUILD_NATIVE" ] && ESBUILD_NATIVE=$(find "$APP_DIR/node_modules" -path "*/@esbuild/linux*/bin/esbuild" -type f 2>/dev/null | head -1)
+[ ! -f "$ESBUILD_NATIVE" ] && ESBUILD_NATIVE="$APP_DIR/node_modules/esbuild/bin/esbuild"
+
 ESBUILD_WASM_JS="$APP_DIR/node_modules/esbuild-wasm/bin/esbuild"
 
-if [ -f "$ESBUILD_WASM_JS" ]; then
-  # Cria wrapper que invoca esbuild-wasm em vez do binário nativo
-  cat > "$ESBUILD_BIN" << 'WRAPPER'
+if [ -f "$ESBUILD_WASM_JS" ] && [ -f "$ESBUILD_NATIVE" ]; then
+  info "Binário nativo: $ESBUILD_NATIVE"
+  # Faz backup do binário ELF original
+  cp "$ESBUILD_NATIVE" "${ESBUILD_NATIVE}.real" 2>/dev/null || true
+  # Substitui o binário ELF por um script Node.js que usa esbuild-wasm
+  # Desta forma o main.js do esbuild continua intacto (a API não quebra)
+  # mas ao spawnar o processo filho, o Node executa WASM em vez do ELF
+  cat > "$ESBUILD_NATIVE" << 'NODEwrapper'
 #!/usr/bin/env node
-// Wrapper: usa esbuild-wasm (JS puro) em vez do binário nativo ELF
-// Evita Bus error em VMs GCP com pouca RAM (e2-micro, e2-small)
+'use strict';
+// Este script substitui o binário ELF nativo do esbuild
+// Usa esbuild-wasm (WebAssembly) para evitar Bus error em VMs com pouca RAM
 const path = require('path');
-const wasmBin = path.resolve(__dirname, '../esbuild-wasm/bin/esbuild');
+const wasmBin = path.resolve(__dirname, '../../../esbuild-wasm/bin/esbuild');
 require(wasmBin);
-WRAPPER
-  chmod +x "$ESBUILD_BIN"
-
-  # Aponta o require do esbuild para esbuild-wasm
-  ESBUILD_PKG="$APP_DIR/node_modules/esbuild/lib/main.js"
-  if [ -f "$ESBUILD_PKG" ]; then
-    # Faz backup do original
-    cp "$ESBUILD_PKG" "${ESBUILD_PKG}.bak" 2>/dev/null || true
-    # Redireciona: substitui o carregamento do binário nativo pelo WASM
-    node -e "
-      const fs = require('fs');
-      let src = fs.readFileSync('$ESBUILD_PKG', 'utf8');
-      // Redireciona o módulo principal para esbuild-wasm
-      if (!src.includes('esbuild-wasm')) {
-        fs.writeFileSync('$ESBUILD_PKG', 'module.exports = require(\"esbuild-wasm\");');
-        console.log('esbuild redirecionado para esbuild-wasm');
-      } else {
-        console.log('esbuild já aponta para wasm');
-      }
-    " 2>/dev/null || warn "Não foi possível redirecionar esbuild/lib/main.js"
-  fi
-  log "esbuild-wasm instalado e configurado"
+NODEwrapper
+  chmod +x "$ESBUILD_NATIVE"
+  log "Binário esbuild nativo substituído por wrapper Node/WASM"
 else
-  warn "esbuild-wasm não encontrado — build pode falhar com Bus error"
+  warn "esbuild-wasm ou binário nativo não encontrado — Bus error pode ocorrer"
+  info "ESBUILD_NATIVE: ${ESBUILD_NATIVE}"
+  info "ESBUILD_WASM_JS: ${ESBUILD_WASM_JS}"
 fi
 
 info "Fazendo build da aplicação..."
@@ -401,7 +395,7 @@ info "Heap Node.js: ${HEAP_MB}MB"
 
 NODE_OPTIONS="--max-old-space-size=${HEAP_MB}" npm run build
 if [ $? -ne 0 ]; then
-  error "Build falhou. Verifique a memória com: free -h"
+  error "Build falhou. Verifique: free -h | pm2 logs"
 fi
 log "Build concluído — dist/ gerado"
 

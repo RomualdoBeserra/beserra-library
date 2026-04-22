@@ -125,20 +125,26 @@ info "esbuild versão: $ESBUILD_VERSION"
 npm install --save-dev "esbuild-wasm@${ESBUILD_VERSION}" --legacy-peer-deps 2>/dev/null \
   || npm install --save-dev esbuild-wasm --legacy-peer-deps 2>/dev/null || true
 
-ESBUILD_PKG="$APP_DIR/node_modules/esbuild/lib/main.js"
-if [ -f "$ESBUILD_PKG" ]; then
-  node -e "
-    const fs = require('fs');
-    const src = fs.readFileSync('$ESBUILD_PKG', 'utf8');
-    if (!src.includes('esbuild-wasm')) {
-      fs.writeFileSync('$ESBUILD_PKG', 'module.exports = require(\"esbuild-wasm\");');
-      console.log('esbuild redirecionado para esbuild-wasm');
-    } else {
-      console.log('esbuild já usa wasm');
-    }
-  " 2>/dev/null || true
+# Substitui apenas o binário ELF nativo — NÃO altera main.js (evita "service stopped")
+ESBUILD_NATIVE="$APP_DIR/node_modules/@esbuild/linux-x64/bin/esbuild"
+[ ! -f "$ESBUILD_NATIVE" ] && ESBUILD_NATIVE=$(find "$APP_DIR/node_modules" -path "*/@esbuild/linux*/bin/esbuild" -type f 2>/dev/null | head -1)
+[ ! -f "$ESBUILD_NATIVE" ] && ESBUILD_NATIVE="$APP_DIR/node_modules/esbuild/bin/esbuild"
+ESBUILD_WASM_JS="$APP_DIR/node_modules/esbuild-wasm/bin/esbuild"
+
+if [ -f "$ESBUILD_WASM_JS" ] && [ -f "$ESBUILD_NATIVE" ]; then
+  cp "$ESBUILD_NATIVE" "${ESBUILD_NATIVE}.real" 2>/dev/null || true
+  cat > "$ESBUILD_NATIVE" << 'NODEwrapper'
+#!/usr/bin/env node
+'use strict';
+const path = require('path');
+const wasmBin = path.resolve(__dirname, '../../../esbuild-wasm/bin/esbuild');
+require(wasmBin);
+NODEwrapper
+  chmod +x "$ESBUILD_NATIVE"
+  log "Binário esbuild substituído por wrapper Node/WASM"
+else
+  warn "esbuild-wasm não encontrado — Bus error pode ocorrer"
 fi
-log "esbuild-wasm configurado"
 
 # ── 8. Swap (evita OOM) ───────────────────────────────────
 section "8. Verificando swap"
