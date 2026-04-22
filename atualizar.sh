@@ -117,33 +117,69 @@ cd "$APP_DIR"
 npm install --legacy-peer-deps 2>&1 | tail -3
 log "Dependências instaladas"
 
-# ── 7. esbuild-wasm (evita Bus error) ────────────────────
-section "7. Configurando esbuild-wasm"
-ESBUILD_VERSION=$(node -e "console.log(require('./node_modules/esbuild/package.json').version)" 2>/dev/null || echo "0.25.0")
-info "esbuild versão: $ESBUILD_VERSION"
+# ── 7. esbuild-wasm (evita Bus error no binário ELF nativo em VMs restritas) ──
+section "7. Configurando esbuild para a VM"
+cd "$APP_DIR"
 
-npm install --save-dev "esbuild-wasm@${ESBUILD_VERSION}" --legacy-peer-deps 2>/dev/null \
-  || npm install --save-dev esbuild-wasm --legacy-peer-deps 2>/dev/null || true
-
-# Substitui apenas o binário ELF nativo — NÃO altera main.js (evita "service stopped")
-ESBUILD_NATIVE="$APP_DIR/node_modules/@esbuild/linux-x64/bin/esbuild"
-[ ! -f "$ESBUILD_NATIVE" ] && ESBUILD_NATIVE=$(find "$APP_DIR/node_modules" -path "*/@esbuild/linux*/bin/esbuild" -type f 2>/dev/null | head -1)
-[ ! -f "$ESBUILD_NATIVE" ] && ESBUILD_NATIVE="$APP_DIR/node_modules/esbuild/bin/esbuild"
-ESBUILD_WASM_JS="$APP_DIR/node_modules/esbuild-wasm/bin/esbuild"
-
-if [ -f "$ESBUILD_WASM_JS" ] && [ -f "$ESBUILD_NATIVE" ]; then
-  cp "$ESBUILD_NATIVE" "${ESBUILD_NATIVE}.real" 2>/dev/null || true
-  cat > "$ESBUILD_NATIVE" << 'NODEwrapper'
-#!/usr/bin/env node
-'use strict';
-const path = require('path');
-const wasmBin = path.resolve(__dirname, '../../../esbuild-wasm/bin/esbuild');
-require(wasmBin);
-NODEwrapper
-  chmod +x "$ESBUILD_NATIVE"
-  log "Binário esbuild substituído por wrapper Node/WASM"
+# Verifica se o binário nativo do esbuild funciona
+if "$APP_DIR/node_modules/@esbuild/linux-x64/bin/esbuild" --version > /dev/null 2>&1; then
+  log "Binário nativo esbuild funciona — nenhuma substituição necessária"
 else
-  warn "esbuild-wasm não encontrado — Bus error pode ocorrer"
+  warn "Binário nativo esbuild falhou (Bus error provável) — instalando esbuild-wasm"
+
+  ESBUILD_VERSION=$(node -e "try{console.log(require('./node_modules/esbuild/package.json').version)}catch(e){console.log('0.25.0')}" 2>/dev/null || echo "0.25.0")
+  info "esbuild versão detectada: $ESBUILD_VERSION"
+
+  # Instala esbuild-wasm na mesma versão
+  npm install --save-dev "esbuild-wasm@${ESBUILD_VERSION}" --legacy-peer-deps 2>/dev/null \
+    || npm install --save-dev esbuild-wasm --legacy-peer-deps 2>/dev/null || true
+
+  ESBUILD_WASM="$APP_DIR/node_modules/esbuild-wasm"
+
+  if [ -d "$ESBUILD_WASM" ]; then
+    # Estratégia: substituir o main.js do esbuild pelo do esbuild-wasm
+    # e redirecionar o bin/esbuild para o script WASM correto
+    ESBUILD_PKG="$APP_DIR/node_modules/esbuild"
+
+    # Backup do main.js original (só se ainda não foi feito)
+    [ ! -f "$ESBUILD_PKG/lib/main.js.orig" ] && \
+      cp "$ESBUILD_PKG/lib/main.js" "$ESBUILD_PKG/lib/main.js.orig" 2>/dev/null || true
+
+    # Copia main.js do esbuild-wasm para o esbuild
+    cp "$ESBUILD_WASM/lib/main.js" "$ESBUILD_PKG/lib/main.js"
+
+    # Reescreve bin/esbuild para carregar o script WASM corretamente
+    cat > "$ESBUILD_PKG/bin/esbuild" << 'WASMBIN'
+#!/usr/bin/env node
+"use strict";
+// Modo WASM — evita Bus error com binários ELF em VMs restritas
+const path = require("path");
+process.env.ESBUILD_WORKER_THREADS = "0";
+const esbuildWasmDir = path.resolve(__dirname, "../../esbuild-wasm");
+require(path.join(esbuildWasmDir, "lib/main.js")).runService(false);
+WASMBIN
+    chmod +x "$ESBUILD_PKG/bin/esbuild"
+
+    # Também redireciona o binário nativo para script Node (evita SIGBUS)
+    NATIVE_BIN=$(find "$APP_DIR/node_modules" -path '*/@esbuild/linux*/bin/esbuild' -not -name '*.orig' -not -name '*.real' 2>/dev/null | head -1)
+    if [ -f "$NATIVE_BIN" ] && file "$NATIVE_BIN" | grep -q ELF; then
+      cp "$NATIVE_BIN" "${NATIVE_BIN}.real" 2>/dev/null || true
+      cat > "$NATIVE_BIN" << 'NATIVEWRAP'
+#!/usr/bin/env node
+"use strict";
+const path = require("path");
+process.env.ESBUILD_WORKER_THREADS = "0";
+const esbuildWasmDir = path.resolve(__dirname, "../../../../esbuild-wasm");
+require(path.join(esbuildWasmDir, "lib/main.js")).runService(false);
+NATIVEWRAP
+      chmod +x "$NATIVE_BIN"
+      log "Binário ELF nativo substituído por wrapper WASM"
+    fi
+
+    log "esbuild-wasm configurado com sucesso"
+  else
+    warn "esbuild-wasm não instalado — Bus error pode ocorrer durante o build"
+  fi
 fi
 
 # ── 8. Swap (evita OOM) ───────────────────────────────────
@@ -168,9 +204,25 @@ TOTAL_MEM=$(free -m | awk '/^Mem/{m=$2} /^Swap/{s=$2} END{printf "%d", (m+s)*0.4
 HEAP_MB=$(( TOTAL_MEM > 1024 ? 1024 : (TOTAL_MEM < 256 ? 256 : TOTAL_MEM) ))
 info "Heap Node.js: ${HEAP_MB}MB"
 
-NODE_OPTIONS="--max-old-space-size=${HEAP_MB}" npm run build
-if [ $? -ne 0 ]; then
-  error "Build falhou. Verifique: free -h"
+BUILD_OK=0
+# Tentativa 1: build normal
+NODE_OPTIONS="--max-old-space-size=${HEAP_MB}" npm run build 2>&1 && BUILD_OK=1
+
+# Tentativa 2: se falhou, tenta com WASM forçado
+if [ "$BUILD_OK" = "0" ]; then
+  warn "Build falhou — tentando com ESBUILD_WORKER_THREADS=0..."
+  ESBUILD_WORKER_THREADS=0 NODE_OPTIONS="--max-old-space-size=${HEAP_MB}" npm run build 2>&1 && BUILD_OK=1
+fi
+
+# Tentativa 3: heap menor
+if [ "$BUILD_OK" = "0" ]; then
+  HEAP_MB=256
+  warn "Tentando com heap reduzido (256MB)..."
+  ESBUILD_WORKER_THREADS=0 NODE_OPTIONS="--max-old-space-size=${HEAP_MB}" npm run build 2>&1 && BUILD_OK=1
+fi
+
+if [ "$BUILD_OK" = "0" ]; then
+  error "Build falhou após 3 tentativas. Verifique: free -h && pm2 logs biblioteca --nostream"
 fi
 log "Build concluído — dist/ atualizado"
 
