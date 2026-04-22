@@ -105,9 +105,8 @@ app.get('/', (c) => c.html(`<!DOCTYPE html>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
       <div class="flex items-center gap-3">
-        <div style="width:40px;height:40px;background:linear-gradient(135deg,#c9882a,#8b5e1a);border-radius:6px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(201,136,42,.3)">
-          <i class="fas fa-book text-yellow-100"></i>
-        </div>
+        <img src="/static/brasao-beserra.jpg" alt="Brasão Família Beserra"
+          style="width:48px;height:52px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(201,136,42,.45));border-radius:2px;"/>
         <div>
           <h1 style="font-family:'Playfair Display',serif;font-size:1.15rem;color:#f0c060;font-weight:700;line-height:1.2;">Beserra Library</h1>
           <p style="font-size:.6rem;color:#7a6040;letter-spacing:.12em;text-transform:uppercase;">Biblioteca Familiar</p>
@@ -1178,8 +1177,8 @@ async function renderPIX(emp){
       <div style="border:2px solid #5c3d1a;border-radius:3px;overflow:hidden" class="mb-4">
         <div class="text-white px-5 py-3 flex items-center justify-between" style="background:#1a0f05">
           <div class="flex items-center gap-3">
-            <i class="fas fa-book-open text-xl"></i>
-            <div><p class="font-bold text-sm">\${nomeBib}</p><p class="text-xs text-gray-300">Comprovante de Solicitação</p></div>
+            <img src="/static/brasao-beserra.jpg" alt="Brasão" style="width:32px;height:36px;object-fit:contain;border-radius:2px;filter:brightness(1.1)"/>
+            <div><p class="font-bold text-sm">\${nomeBib}</p><p class="text-xs" style="color:#c9a96e">Comprovante de Solicitação</p></div>
           </div>
           <div class="text-right">
             <p class="text-xs text-gray-300">Nº do Pedido</p>
@@ -1195,7 +1194,7 @@ async function renderPIX(emp){
         </div>
         <div class="px-5 py-3 flex items-center justify-between" style="background:#2a1a05">
           <p class="text-sm font-medium" style="color:#c9a96e">Valor a pagar (frete)</p>
-          <p class="font-bold text-2xl" style="color:#c9882a">${fmtMoeda(emp.frete_valor)}</p>
+          <p class="font-bold text-2xl" style="color:#c9882a">\${fmtMoeda(emp.frete_valor)}</p>
         </div>
       </div>
 
